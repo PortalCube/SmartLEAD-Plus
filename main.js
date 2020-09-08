@@ -637,7 +637,7 @@ function ConstructContent() {
         if (item.total === 0) {
             item.percent = 100;
         } else {
-            item.percent = (item.complete / item.total) * 100;
+            item.percent = Math.round((item.complete / item.total) * 100);
         }
 
         node = node.replace("{{ID}}", item.id);
