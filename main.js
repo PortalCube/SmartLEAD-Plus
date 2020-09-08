@@ -456,7 +456,7 @@ async function UpdateData() {
                         start: null,
                         end: item.date
                     };
-                    act.complete = item.date < moment();
+                    act.complete = moment(item.date) < moment();
                     break;
                 case 3: // 과제
                     item = _.find(assign, { id: act.id });
@@ -472,7 +472,7 @@ async function UpdateData() {
                         start: null,
                         end: item.date
                     };
-                    act.complete = item.date < moment();
+                    act.complete = moment(item.date) < moment();
                     break;
             }
 
@@ -686,7 +686,7 @@ function MainInit() {
     ConstructContent();
 
     // 데이터가 없거나 마지막 갱신 이후로 5분이 지나면 업데이트
-    if (course_data.lastUpdate === null || (moment() - moment(course_data.lastUpdate)) >= 1000 * 60 * 5) {
+    if (course_data.lastUpdate === null || moment() - moment(course_data.lastUpdate) >= 1000 * 60 * 5) {
         UpdateData();
     } else {
         StatusText();
