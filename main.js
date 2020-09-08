@@ -551,7 +551,13 @@ function ConstructContent() {
 
     for (let course of course_data.data) {
         for (let act of course.act) {
-            if (!act.complete && moment(act.schedule.end) > now) {
+            let endTime = moment(act.schedule.end);
+
+            if (act.type === 2) {
+                endTime.add(2, "h"); // Zoom 수업의 경우, 종료 시점을 2시간 연장하여 처리. (화상 수업이 약간 늦게 시작할 수 있는 점 고려)
+            }
+
+            if (!act.complete && endTime > now) {
                 todoList.push(act);
             }
         }
@@ -603,7 +609,10 @@ function ConstructContent() {
         }
 
         node = node.replace("{{DATE}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
-        node = node.replace("{{TIMELEFT}}", now.from(moment(item.schedule.end), true) + " 남음");
+        node = node.replace(
+            "{{TIMELEFT}}",
+            (timeLeft < 0 ? "-" : "") + now.from(moment(item.schedule.end), true) + " 남음"
+        ); // Zoom 수업의 경우, 마이너스 시간이 발생할 수 있음.
 
         targetNode.innerHTML += node;
     }
