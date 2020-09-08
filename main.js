@@ -379,15 +379,15 @@ async function ScrapProgressPage(id) {
             week = parseInt(childNodeList[0].textContent);
             data.name = childNodeList[1].textContent.trim();
             data.time.require = ParseTimeText(childNodeList[2].textContent);
-            data.time.value = ParseTimeText(childNodeList[3].innerText.split("\n")[0]);
-            data.complete = childNodeList[5].textContent === "O";
+            data.time.value = ParseTimeText(childNodeList[3].firstChild.textContent.trim());
+            data.complete = childNodeList[4].textContent === "O";
         } else {
             if (!childNodeList[0].classList.contains("text-left")) {
                 continue;
             }
             data.name = childNodeList[0].textContent.trim();
             data.time.require = ParseTimeText(childNodeList[1].textContent);
-            data.time.value = ParseTimeText(childNodeList[2].innerText.split("\n")[0]);
+            data.time.value = ParseTimeText(childNodeList[2].firstChild.textContent.trim());
             data.complete = childNodeList[3].textContent === "O";
         }
 
