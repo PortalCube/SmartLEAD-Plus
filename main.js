@@ -271,14 +271,14 @@ async function ScrapData() {
     let result = [];
 
     for (let course of courseList) {
-        let detail = await ScrapCoursePage(course.id);
+        let data = await ScrapCoursePage(course.id);
         let progress = await ScrapProgressPage(course.id);
         let zoom = await ScrapZoomPage(course.id);
         let assign = await ScrapAssignPage(course.id);
         let quiz = await ScrapQuizPage(course.id);
 
         // 각각의 페이지에서 가져온 데이터들을 merge
-        for (let act of detail.act) {
+        for (let act of data.act) {
             let item;
             switch (act.type) {
                 case 1: // 동영상 VOD
@@ -318,15 +318,15 @@ async function ScrapData() {
 
             if (act.schedule.end === undefined) {
                 // 마감 기한을 정하지 않은 경우.. 활동 주차의 마지막 날을 마감 기한으로 설정
-                let weekInfo = _.find(detail.week, { week: act.week });
+                let weekInfo = _.find(data.week, { week: act.week });
                 act.schedule.end = weekInfo.end;
             }
         }
 
-        detail.name = course.name;
-        detail.id = course.id;
+        data.name = course.name;
+        data.id = course.id;
 
-        result.push(detail);
+        result.push(data);
     }
 
     return result;
