@@ -21,7 +21,7 @@ const ICON_ASSIGN = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/
 const ICON_QUIZ = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/quiz/1599440449/icon";
 
 const CSS = `.progress_courses .course_list_btn_group {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: normal;
 }
 
