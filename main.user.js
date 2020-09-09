@@ -529,7 +529,7 @@ function StatusText() {
     let text = "";
 
     if (course_data.lastUpdate) {
-        text = "마지막 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
+        text = "마지막 데이터 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
     }
 
     if (course_data.isUpdating) {
