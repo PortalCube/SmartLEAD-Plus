@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         SmartLEAD+
 // @namespace    https://github.com/PortalCube/
-// @version      0.1.0
-// @description  한림대학교의 LMS, SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
+// @version      0.1.1
+// @description  SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
 // @author       PortalCube@hallym
 // @match        https://smartlead.hallym.ac.kr/*
 // @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
@@ -11,17 +11,32 @@
 // ==/UserScript==
 ("use strict");
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
-const ICON_VOD = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/vod/1599440449/icon";
-const ICON_ZOOM = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/zoom/1599440449/icon";
-const ICON_ASSIGN = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/assign/1599440449/icon";
-const ICON_QUIZ = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/quiz/1599440449/icon";
+const URL_MAIN = "https://smartlead.hallym.ac.kr";
+
+const URL_ICON_VOD = URL_MAIN + "/theme/image.php/coursemosv2/vod/1599440449/icon";
+const URL_ICON_ZOOM = URL_MAIN + "/theme/image.php/coursemosv2/zoom/1599440449/icon";
+const URL_ICON_ASSIGN = URL_MAIN + "/theme/image.php/coursemosv2/assign/1599440449/icon";
+const URL_ICON_QUIZ = URL_MAIN + "/theme/image.php/coursemosv2/quiz/1599440449/icon";
+
+const URL_COURSE_LIST = URL_MAIN + "/local/ubion/user/";
+const URL_COURSE_MAIN = URL_MAIN + "/course/view.php?id=";
+const URL_ATTENDANCE_LIST = URL_MAIN + "/report/ubcompletion/user_progress_a.php?id=";
+const URL_ZOOM_LIST = URL_MAIN + "/mod/zoom/index.php?id=";
+const URL_ASSIGN_LIST = URL_MAIN + "/mod/assign/index.php?id=";
+const URL_QUIZ_LIST = URL_MAIN + "/mod/quiz/index.php?id=";
+
+const URL_VOD_VIEW = URL_MAIN + "/mod/vod/viewer.php?id=";
+const URL_ZOOM_VIEW = URL_MAIN + "/mod/zoom/view.php?id=";
+const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
+const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
 const CSS = `.progress_courses .course_list_btn_group {
-    font-size: 16px;
+    float: none !important;
+    font-size: 12px;
     font-weight: normal;
 }
 
@@ -46,12 +61,12 @@ const CSS = `.progress_courses .course_list_btn_group {
     margin-right: 8px;
 }
 
-.plus-course-date {
-    font-size: 16px;
+.plus-course-todo-sub {
+    font-size: 12px;
     margin-right: 5px;
 }
 
-.plus-course-timeleft {
+.plus-course-todo-main {
     font-size: 16px;
     font-weight: 700;
 }
@@ -70,7 +85,12 @@ const CSS = `.progress_courses .course_list_btn_group {
 
 .plus-course-top {
     display: flex;
+    line-height: 24px;
     justify-content: space-between;
+}
+
+.plus-course-progress {
+    margin-top: 4px;
 }
 
 .progress_courses .course_lists .my-course-lists .course-name p {
@@ -110,10 +130,10 @@ const CSS = `.progress_courses .course_list_btn_group {
     color: #0cad32;
 }`;
 
-const HTML_BTNGROUP = `<span id="plus-data-status"></span>
-<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
+const HTML_BTNGROUP = `<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
 <button id="plus-course-todo-btn" type="button">할 일 목록</button>
-<button id="plus-course-summary-btn" type="button">이번주 학습 요약</button>`;
+<button id="plus-course-summary-btn" type="button">이번주 학습 요약</button>
+<span id="plus-data-status"></span>`;
 const HTML_FRAME = `<div id="{{ID}}" class="course_lists" style="display: none;">
     <ul class="smartlead_plus my-course-lists coursemos-layout-0">
     </ul>
@@ -156,13 +176,17 @@ const HTML_TODO = `<li class="course_label_re_03">
                     </div>
                 </div>
                 <div class="plus-course-percent-text level{{LEVEL}}">
-                    <span class="plus-course-date">{{DATE}}</span>
-                    <span class="plus-course-timeleft">{{TIMELEFT}}</span>
+                    <span class="plus-course-todo-sub">{{SUB}}</span>
+                    <span class="plus-course-todo-main">{{MAIN}}</span>
                 </div>
             </div>
         </a>
     </div>
 </li>`;
+const HTML_ACT_INFO = `<span class="displayoptions"
+><span class="text-ubstrap">&nbsp;{{STATUS}}&nbsp;<span class="text-late">{{PROGRESS}}</span></span
+><span class="text-info">&nbsp;{{DATE}}</span></span
+>`;
 
 let course_year = moment().year();
 let course_week = 0;
@@ -173,7 +197,7 @@ let course_data = {
 };
 
 async function ScrapCoursePage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/course/view.php?id=" + id)).text();
+    let req = await (await fetch(URL_COURSE_MAIN + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".attendance > li");
     let result = {
@@ -208,7 +232,7 @@ async function ScrapCoursePage(id) {
 
     // 강의 활동 정보 체크 및 각 주차별 기간 체크
     for (let weekNode of nodeList) {
-        let actNodeList = weekNode.querySelectorAll(".total_sections .activity:not(.label):not(.ubfile)");
+        let actNodeList = weekNode.querySelectorAll(".total_sections .activity:not(.label)");
 
         REGEX_WEEK.lastIndex = 0;
 
@@ -267,7 +291,7 @@ async function ScrapCoursePage(id) {
 }
 
 async function ScrapZoomPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/zoom/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_ZOOM_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".meeting-list tbody:not(.empty) tr");
     let result = [];
@@ -292,7 +316,7 @@ async function ScrapZoomPage(id) {
 }
 
 async function ScrapAssignPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/assign/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_ASSIGN_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -318,7 +342,7 @@ async function ScrapAssignPage(id) {
 }
 
 async function ScrapQuizPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/quiz/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_QUIZ_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -346,9 +370,7 @@ async function ScrapQuizPage(id) {
 }
 
 async function ScrapProgressPage(id) {
-    let req = await (
-        await fetch("https://smartlead.hallym.ac.kr/report/ubcompletion/user_progress_a.php?id=" + id)
-    ).text();
+    let req = await (await fetch(URL_ATTENDANCE_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".user_progress_table tr");
     let result = [];
@@ -378,16 +400,16 @@ async function ScrapProgressPage(id) {
             }
             week = parseInt(childNodeList[0].textContent);
             data.name = childNodeList[1].textContent.trim();
-            data.time.require = ParseTimeText(childNodeList[2].textContent);
-            data.time.value = ParseTimeText(childNodeList[3].innerText.split("\n")[0]);
-            data.complete = childNodeList[5].textContent === "O";
+            data.time.require = TextToTime(childNodeList[2].textContent);
+            data.time.value = TextToTime(childNodeList[3].firstChild.textContent.trim());
+            data.complete = childNodeList[4].textContent === "O";
         } else {
             if (!childNodeList[0].classList.contains("text-left")) {
                 continue;
             }
             data.name = childNodeList[0].textContent.trim();
-            data.time.require = ParseTimeText(childNodeList[1].textContent);
-            data.time.value = ParseTimeText(childNodeList[2].innerText.split("\n")[0]);
+            data.time.require = TextToTime(childNodeList[1].textContent);
+            data.time.value = TextToTime(childNodeList[2].firstChild.textContent.trim());
             data.complete = childNodeList[3].textContent === "O";
         }
 
@@ -400,7 +422,7 @@ async function ScrapProgressPage(id) {
 }
 
 async function ScrapListPage() {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/local/ubion/user/")).text();
+    let req = await (await fetch(URL_COURSE_LIST)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".coursefullname");
     let result = [];
@@ -444,10 +466,11 @@ async function UpdateData() {
                 case 1: // 동영상 VOD
                     item = _.find(progress, { name: act.name });
                     act.complete = item.complete;
+                    act.vod_status = item.time;
                     if (item.done) {
                         act.progress = 100;
                     } else {
-                        act.progress = Math.round((item.time.value / item.time.require) * 100);
+                        act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
                     }
                     break;
                 case 2: // ZOOM 화상 강의
@@ -506,7 +529,7 @@ function StatusText() {
     let text = "";
 
     if (course_data.lastUpdate) {
-        text = "마지막 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
+        text = "마지막 데이터 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
     }
 
     if (course_data.isUpdating) {
@@ -516,16 +539,46 @@ function StatusText() {
     document.querySelector("#plus-data-status").textContent = text;
 }
 
-function ParseTimeText(time) {
+function TextToTime(time) {
     let array = time.split(":");
+
+    let hr = 0;
+    let min = 0;
+    let sec = 0;
 
     if (array.length < 2) {
         return 0;
+    } else if (array.length === 2) {
+        min = parseInt(array[0]);
+        sec = parseInt(array[1]);
+    } else {
+        hr = parseInt(array[0]);
+        min = parseInt(array[1]);
+        sec = parseInt(array[2]);
     }
 
-    let min = parseInt(array[0]);
-    let sec = parseInt(array[1]);
-    return min * 60 + sec;
+    return hr * 60 * 60 + min * 60 + sec;
+}
+
+function TimeToText(time) {
+    let min = Math.floor(time / 60);
+    let sec = time - min * 60;
+    let hr = Math.floor(min / 60);
+    min -= hr * 60;
+    if (hr !== 0) {
+        return `${PadLeft(hr, 2)}:${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+    } else {
+        return `${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+    }
+}
+
+function PadLeft(number, count) {
+    let length = number.toString().length;
+    let result = "";
+    for (let i = 0; i < count - length; i++) {
+        result += "0";
+    }
+    return result + number;
 }
 
 function ConstructContent() {
@@ -551,7 +604,9 @@ function ConstructContent() {
 
     for (let course of course_data.data) {
         for (let act of course.act) {
-            if (!act.complete && moment(act.schedule.end) > now) {
+            let endTime = moment(act.schedule.end);
+
+            if (!act.complete && endTime > now) {
                 todoList.push(act);
             }
         }
@@ -567,23 +622,23 @@ function ConstructContent() {
 
         switch (item.type) {
             case 1: // 동영상 VOD
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/vod/viewer.php?id=${item.id}`);
-                node = node.replace("{{ICON}}", ICON_VOD);
+                node = node.replace("{{URL}}", URL_VOD_VIEW + item.id);
+                node = node.replace("{{ICON}}", URL_ICON_VOD);
                 node = node.replace("{{ICON_ALT}}", "동영상");
                 break;
             case 2: // ZOOM 화상 강의
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/zoom/view.php?id=${item.id}`);
-                node = node.replace("{{ICON}}", ICON_ZOOM);
+                node = node.replace("{{URL}}", URL_ZOOM_VIEW + item.id);
+                node = node.replace("{{ICON}}", URL_ICON_ZOOM);
                 node = node.replace("{{ICON_ALT}}", "화상강의");
                 break;
             case 3: // 과제
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/assign/view.php?id=${item.id}`);
-                node = node.replace("{{ICON}}", ICON_ASSIGN);
+                node = node.replace("{{URL}}", URL_ASSIGN_VIEW + item.id);
+                node = node.replace("{{ICON}}", URL_ICON_ASSIGN);
                 node = node.replace("{{ICON_ALT}}", "과제");
                 break;
             case 4: // 퀴즈
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/quiz/view.php?id=${item.id}`);
-                node = node.replace("{{ICON}}", ICON_QUIZ);
+                node = node.replace("{{URL}}", URL_QUIZ_VIEW + item.id);
+                node = node.replace("{{ICON}}", URL_ICON_QUIZ);
                 node = node.replace("{{ICON_ALT}}", "퀴즈");
                 break;
         }
@@ -602,8 +657,8 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        node = node.replace("{{DATE}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
-        node = node.replace("{{TIMELEFT}}", now.from(moment(item.schedule.end), true) + " 남음");
+        node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("MM.DD HH:mm")}`);
+        node = node.replace("{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음");
 
         targetNode.innerHTML += node;
     }
@@ -628,7 +683,7 @@ function ConstructContent() {
         if (item.total === 0) {
             item.percent = 100;
         } else {
-            item.percent = (item.complete / item.total) * 100;
+            item.percent = Math.round((item.complete / item.total) * 100);
         }
 
         node = node.replace("{{ID}}", item.id);
@@ -671,15 +726,15 @@ function MainInit() {
         document.querySelector(".progress_courses").innerHTML += html;
     }
 
-    document.querySelector(`#plus-course-all-btn`).onclick = function () {
+    document.querySelector("#plus-course-all-btn").onclick = function () {
         LoadContent("course-all");
     };
 
-    document.querySelector(`#plus-course-todo-btn`).onclick = function () {
+    document.querySelector("#plus-course-todo-btn").onclick = function () {
         LoadContent("course-todo");
     };
 
-    document.querySelector(`#plus-course-summary-btn`).onclick = function () {
+    document.querySelector("#plus-course-summary-btn").onclick = function () {
         LoadContent("course-summary");
     };
 
@@ -690,6 +745,52 @@ function MainInit() {
         UpdateData();
     } else {
         StatusText();
+    }
+}
+
+function CourseInit() {
+    if (course_data.lastUpdate === null) {
+        return;
+    }
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let course_id = parseInt(urlParams.get("id"));
+    let course = _.find(course_data.data, { id: course_id });
+
+    if (!course) {
+        return;
+    }
+
+    // 각 활동에 마감 기한, 진행 상태 표기
+    let nodeList = document.querySelectorAll(".activity:not(.label)");
+    for (let node of nodeList) {
+        let html = HTML_ACT_INFO;
+        let id = parseInt(node.getAttribute("id").split("-")[1]);
+        let act = _.find(course.act, { id });
+
+        if (!act) {
+            continue;
+        }
+
+        html = html.replace("{{STATUS}}", (act.complete ? "" : "미") + "완료");
+
+        if (act.type === 1) {
+            html = html.replace(
+                "{{PROGRESS}}",
+                `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`
+            );
+        } else {
+            html = html.replace("{{PROGRESS}}", `(${act.complete ? 100 : 0}%)`);
+        }
+
+        html = html.replace("{{DATE}}", `기한: ${moment(act.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+
+        if (node.querySelector(".displayoptions")) {
+            // 기존 텍스트는 삭제.
+            node.querySelector(".displayoptions").remove();
+        }
+
+        node.querySelector(".activityinstance").innerHTML += html;
     }
 }
 
@@ -707,8 +808,11 @@ function Init() {
     }
 
     switch (path) {
-        case "/":
+        case "/": // 메인 페이지
             MainInit();
+            break;
+        case "/course/view.php": // 강좌 메인 페이지
+            CourseInit();
             break;
     }
 }
