@@ -35,6 +35,7 @@ const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
 const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
 const CSS = `.progress_courses .course_list_btn_group {
+    float: none !important;
     font-size: 12px;
     font-weight: normal;
 }
@@ -129,10 +130,10 @@ const CSS = `.progress_courses .course_list_btn_group {
     color: #0cad32;
 }`;
 
-const HTML_BTNGROUP = `<span id="plus-data-status"></span>
-<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
+const HTML_BTNGROUP = `<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
 <button id="plus-course-todo-btn" type="button">할 일 목록</button>
-<button id="plus-course-summary-btn" type="button">이번주 학습 요약</button>`;
+<button id="plus-course-summary-btn" type="button">이번주 학습 요약</button>
+<span id="plus-data-status"></span>`;
 const HTML_FRAME = `<div id="{{ID}}" class="course_lists" style="display: none;">
     <ul class="smartlead_plus my-course-lists coursemos-layout-0">
     </ul>
