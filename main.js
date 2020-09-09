@@ -26,7 +26,7 @@ const URL_COURSE_LIST = URL_MAIN + "/local/ubion/user/";
 const URL_COURSE_MAIN = URL_MAIN + "/course/view.php?id=";
 const URL_ATTENDANCE_LIST = URL_MAIN + "/report/ubcompletion/user_progress_a.php?id=";
 const URL_ZOOM_LIST = URL_MAIN + "/mod/zoom/index.php?id=";
-const URL_ASSIGN_LIST = URL_MAIN+ "/mod/assign/index.php?id=";
+const URL_ASSIGN_LIST = URL_MAIN + "/mod/assign/index.php?id=";
 const URL_QUIZ_LIST = URL_MAIN + "/mod/quiz/index.php?id=";
 
 const URL_VOD_VIEW = URL_MAIN + "/mod/vod/viewer.php?id=";
@@ -365,9 +365,7 @@ async function ScrapQuizPage(id) {
 }
 
 async function ScrapProgressPage(id) {
-    let req = await (
-        await fetch(URL_ATTENDANCE_LIST + id)
-    ).text();
+    let req = await (await fetch(URL_ATTENDANCE_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".user_progress_table tr");
     let result = [];
@@ -539,7 +537,9 @@ function StatusText() {
 function TextToTime(time) {
     let array = time.split(":");
 
-    let hr, min, sec;
+    let hr = 0;
+    let min = 0;
+    let sec = 0;
 
     if (array.length < 2) {
         return 0;
@@ -552,13 +552,19 @@ function TextToTime(time) {
         sec = parseInt(array[2]);
     }
 
-    return (hr * 60 * 60) + (min * 60) + sec;
+    return hr * 60 * 60 + min * 60 + sec;
 }
 
 function TimeToText(time) {
     let min = Math.floor(time / 60);
     let sec = time - min * 60;
-    return `${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+    let hr = Math.floor(min / 60);
+    min -= hr * 60;
+    if (hr !== 0) {
+        return `${PadLeft(hr, 2)}:${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+    } else {
+        return `${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+    }
 }
 
 function PadLeft(number, count) {
@@ -647,14 +653,17 @@ function ConstructContent() {
         }
 
         if (item.type === 1) {
-            node = node.replace("{{SUB}}", `${TimeToText(item.vod_status.value)}/${TimeToText(item.vod_status.require)} (${item.progress}%) 기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+            node = node.replace(
+                "{{SUB}}",
+                `${TimeToText(item.vod_status.value)}/${TimeToText(item.vod_status.require)} (${
+                    item.progress
+                }%) 기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`
+            );
         } else {
             node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
         }
-        
-        node = node.replace(
-            "{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음"
-        );
+
+        node = node.replace("{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음");
 
         targetNode.innerHTML += node;
     }
