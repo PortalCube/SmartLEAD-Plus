@@ -227,7 +227,7 @@ async function ScrapCoursePage(id) {
 
     // 강의 활동 정보 체크 및 각 주차별 기간 체크
     for (let weekNode of nodeList) {
-        let actNodeList = weekNode.querySelectorAll(".total_sections .activity:not(.label):not(.ubfile)");
+        let actNodeList = weekNode.querySelectorAll(".total_sections .activity:not(.label)");
 
         REGEX_WEEK.lastIndex = 0;
 
