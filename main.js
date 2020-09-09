@@ -469,7 +469,7 @@ async function UpdateData() {
                     if (item.done) {
                         act.progress = 100;
                     } else {
-                        act.progress = Math.round((item.time.value / item.time.require) * 100);
+                        act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
                     }
                     break;
                 case 2: // ZOOM 화상 강의
