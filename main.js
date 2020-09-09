@@ -2,7 +2,7 @@
 // @name         SmartLEAD+
 // @namespace    https://github.com/PortalCube/
 // @version      0.1.0
-// @description  한림대학교의 LMS, SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
+// @description  SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
 // @author       PortalCube@hallym
 // @match        https://smartlead.hallym.ac.kr/*
 // @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
@@ -17,10 +17,10 @@ const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\
 
 const URL_MAIN = "https://smartlead.hallym.ac.kr";
 
-const ICON_VOD = URL_MAIN + "/theme/image.php/coursemosv2/vod/1599440449/icon";
-const ICON_ZOOM = URL_MAIN + "/theme/image.php/coursemosv2/zoom/1599440449/icon";
-const ICON_ASSIGN = URL_MAIN + "/theme/image.php/coursemosv2/assign/1599440449/icon";
-const ICON_QUIZ = URL_MAIN + "/theme/image.php/coursemosv2/quiz/1599440449/icon";
+const URL_ICON_VOD = URL_MAIN + "/theme/image.php/coursemosv2/vod/1599440449/icon";
+const URL_ICON_ZOOM = URL_MAIN + "/theme/image.php/coursemosv2/zoom/1599440449/icon";
+const URL_ICON_ASSIGN = URL_MAIN + "/theme/image.php/coursemosv2/assign/1599440449/icon";
+const URL_ICON_QUIZ = URL_MAIN + "/theme/image.php/coursemosv2/quiz/1599440449/icon";
 
 const URL_COURSE_LIST = URL_MAIN + "/local/ubion/user/";
 const URL_COURSE_MAIN = URL_MAIN + "/course/view.php?id=";
@@ -623,22 +623,22 @@ function ConstructContent() {
         switch (item.type) {
             case 1: // 동영상 VOD
                 node = node.replace("{{URL}}", URL_VOD_VIEW + item.id);
-                node = node.replace("{{ICON}}", ICON_VOD);
+                node = node.replace("{{ICON}}", URL_ICON_VOD);
                 node = node.replace("{{ICON_ALT}}", "동영상");
                 break;
             case 2: // ZOOM 화상 강의
                 node = node.replace("{{URL}}", URL_ZOOM_VIEW + item.id);
-                node = node.replace("{{ICON}}", ICON_ZOOM);
+                node = node.replace("{{ICON}}", URL_ICON_ZOOM);
                 node = node.replace("{{ICON_ALT}}", "화상강의");
                 break;
             case 3: // 과제
                 node = node.replace("{{URL}}", URL_ASSIGN_VIEW + item.id);
-                node = node.replace("{{ICON}}", ICON_ASSIGN);
+                node = node.replace("{{ICON}}", URL_ICON_ASSIGN);
                 node = node.replace("{{ICON_ALT}}", "과제");
                 break;
             case 4: // 퀴즈
                 node = node.replace("{{URL}}", URL_QUIZ_VIEW + item.id);
-                node = node.replace("{{ICON}}", ICON_QUIZ);
+                node = node.replace("{{ICON}}", URL_ICON_QUIZ);
                 node = node.replace("{{ICON_ALT}}", "퀴즈");
                 break;
         }
