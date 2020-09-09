@@ -4,6 +4,9 @@
 // @version      0.1.1
 // @description  SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
 // @author       PortalCube@hallym
+// @homepageURL  https://github.com/PortalCube/SmartLEAD-Plus
+// @downloadURL  https://github.com/PortalCube/SmartLEAD-Plus/raw/master/main.user.js
+// @updateURL    https://github.com/PortalCube/SmartLEAD-Plus/raw/master/main.user.js
 // @match        https://smartlead.hallym.ac.kr/*
 // @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
 // @require      https://momentjs.com/downloads/moment-with-locales.min.js
