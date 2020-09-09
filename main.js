@@ -60,12 +60,12 @@ const CSS = `.progress_courses .course_list_btn_group {
     margin-right: 8px;
 }
 
-.plus-course-date {
+.plus-course-todo-sub {
     font-size: 16px;
     margin-right: 5px;
 }
 
-.plus-course-timeleft {
+.plus-course-todo-main {
     font-size: 16px;
     font-weight: 700;
 }
@@ -84,6 +84,7 @@ const CSS = `.progress_courses .course_list_btn_group {
 
 .plus-course-top {
     display: flex;
+    line-height: 24px;
     justify-content: space-between;
 }
 
@@ -170,8 +171,8 @@ const HTML_TODO = `<li class="course_label_re_03">
                     </div>
                 </div>
                 <div class="plus-course-percent-text level{{LEVEL}}">
-                    <span class="plus-course-date">{{DATE}}</span>
-                    <span class="plus-course-timeleft">{{TIMELEFT}}</span>
+                    <span class="plus-course-todo-sub">{{SUB}}</span>
+                    <span class="plus-course-todo-main">{{MAIN}}</span>
                 </div>
             </div>
         </a>
@@ -618,9 +619,9 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        node = node.replace("{{DATE}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+        node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
         node = node.replace(
-            "{{TIMELEFT}}", now.from(moment(item.schedule.end), true) + " 남음"
+            "{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음"
         );
 
         targetNode.innerHTML += node;
