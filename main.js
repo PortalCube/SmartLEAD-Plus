@@ -182,6 +182,10 @@ const HTML_TODO = `<li class="course_label_re_03">
         </a>
     </div>
 </li>`;
+const HTML_ACT_INFO = `<span class="displayoptions"
+><span class="text-ubstrap">&nbsp;{{STATUS}}&nbsp;<span class="text-late">{{PROGRESS}}</span></span
+><span class="text-info">&nbsp;{{DATE}}</span></span
+>`;
 
 let course_year = moment().year();
 let course_week = 0;
@@ -753,6 +757,52 @@ function MainInit() {
     }
 }
 
+function CourseInit() {
+    if (course_data.lastUpdate === null) {
+        return;
+    }
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let course_id = parseInt(urlParams.get("id"));
+    let course = _.find(course_data.data, { id: course_id });
+
+    if (!course) {
+        return;
+    }
+
+    // 각 활동에 마감 기한, 진행 상태 표기
+    let nodeList = document.querySelectorAll(".activity:not(.label)");
+    for (let node of nodeList) {
+        let html = HTML_ACT_INFO;
+        let id = parseInt(node.getAttribute("id").split("-")[1]);
+        let act = _.find(course.act, { id });
+
+        if (!act) {
+            continue;
+        }
+
+        html = html.replace("{{STATUS}}", (act.complete ? "" : "미") + "완료");
+
+        if (act.type === 1) {
+            html = html.replace(
+                "{{PROGRESS}}",
+                `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`
+            );
+        } else {
+            html = html.replace("{{PROGRESS}}", `(${act.complete ? 100 : 0}%)`);
+        }
+
+        html = html.replace("{{DATE}}", `기한: ${moment(act.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+
+        if (node.querySelector(".displayoptions")) {
+            // 기존 텍스트는 삭제.
+            node.querySelector(".displayoptions").remove();
+        }
+
+        node.querySelector(".activityinstance").innerHTML += html;
+    }
+}
+
 function Init() {
     let path = location.pathname;
 
@@ -769,6 +819,9 @@ function Init() {
     switch (path) {
         case "/": // 메인 페이지
             MainInit();
+            break;
+        case "/course/view.php": // 강좌 메인 페이지
+            CourseInit();
             break;
     }
 }
