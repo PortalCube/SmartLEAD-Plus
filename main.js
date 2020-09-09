@@ -539,13 +539,20 @@ function StatusText() {
 function TextToTime(time) {
     let array = time.split(":");
 
+    let hr, min, sec;
+
     if (array.length < 2) {
         return 0;
+    } else if (array.length === 2) {
+        min = parseInt(array[0]);
+        sec = parseInt(array[1]);
+    } else {
+        hr = parseInt(array[0]);
+        min = parseInt(array[1]);
+        sec = parseInt(array[2]);
     }
 
-    let min = parseInt(array[0]);
-    let sec = parseInt(array[1]);
-    return min * 60 + sec;
+    return (hr * 60 * 60) + (min * 60) + sec;
 }
 
 function TimeToText(time) {
