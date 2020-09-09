@@ -689,15 +689,15 @@ function MainInit() {
         document.querySelector(".progress_courses").innerHTML += html;
     }
 
-    document.querySelector(`#plus-course-all-btn`).onclick = function () {
+    document.querySelector("#plus-course-all-btn").onclick = function () {
         LoadContent("course-all");
     };
 
-    document.querySelector(`#plus-course-todo-btn`).onclick = function () {
+    document.querySelector("#plus-course-todo-btn").onclick = function () {
         LoadContent("course-todo");
     };
 
-    document.querySelector(`#plus-course-summary-btn`).onclick = function () {
+    document.querySelector("#plus-course-summary-btn").onclick = function () {
         LoadContent("course-summary");
     };
 
@@ -725,7 +725,7 @@ function Init() {
     }
 
     switch (path) {
-        case "/":
+        case "/": // 메인 페이지
             MainInit();
             break;
     }
