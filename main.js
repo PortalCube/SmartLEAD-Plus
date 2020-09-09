@@ -397,16 +397,16 @@ async function ScrapProgressPage(id) {
             }
             week = parseInt(childNodeList[0].textContent);
             data.name = childNodeList[1].textContent.trim();
-            data.time.require = ParseTimeText(childNodeList[2].textContent);
-            data.time.value = ParseTimeText(childNodeList[3].firstChild.textContent.trim());
+            data.time.require = TextToTime(childNodeList[2].textContent);
+            data.time.value = TextToTime(childNodeList[3].firstChild.textContent.trim());
             data.complete = childNodeList[4].textContent === "O";
         } else {
             if (!childNodeList[0].classList.contains("text-left")) {
                 continue;
             }
             data.name = childNodeList[0].textContent.trim();
-            data.time.require = ParseTimeText(childNodeList[1].textContent);
-            data.time.value = ParseTimeText(childNodeList[2].firstChild.textContent.trim());
+            data.time.require = TextToTime(childNodeList[1].textContent);
+            data.time.value = TextToTime(childNodeList[2].firstChild.textContent.trim());
             data.complete = childNodeList[3].textContent === "O";
         }
 
@@ -463,6 +463,7 @@ async function UpdateData() {
                 case 1: // 동영상 VOD
                     item = _.find(progress, { name: act.name });
                     act.complete = item.complete;
+                    act.vod_status = item.time;
                     if (item.done) {
                         act.progress = 100;
                     } else {
@@ -535,7 +536,7 @@ function StatusText() {
     document.querySelector("#plus-data-status").textContent = text;
 }
 
-function ParseTimeText(time) {
+function TextToTime(time) {
     let array = time.split(":");
 
     if (array.length < 2) {
@@ -545,6 +546,21 @@ function ParseTimeText(time) {
     let min = parseInt(array[0]);
     let sec = parseInt(array[1]);
     return min * 60 + sec;
+}
+
+function TimeToText(time) {
+    let min = Math.floor(time / 60);
+    let sec = time - min * 60;
+    return `${PadLeft(min, 2)}:${PadLeft(sec, 2)}`;
+}
+
+function PadLeft(number, count) {
+    let length = number.toString().length;
+    let result = "";
+    for (let i = 0; i < count - length; i++) {
+        result += "0";
+    }
+    return result + number;
 }
 
 function ConstructContent() {
@@ -623,7 +639,12 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+        if (item.type === 1) {
+            node = node.replace("{{SUB}}", `${TimeToText(item.vod_status.value)}/${TimeToText(item.vod_status.require)} (${item.progress}%) 기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+        } else {
+            node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+        }
+        
         node = node.replace(
             "{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음"
         );
