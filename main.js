@@ -88,6 +88,10 @@ const CSS = `.progress_courses .course_list_btn_group {
     justify-content: space-between;
 }
 
+.plus-course-progress {
+    margin-top: 4px;
+}
+
 .progress_courses .course_lists .my-course-lists .course-name p {
     margin: 0;
     font-size: 16px;
