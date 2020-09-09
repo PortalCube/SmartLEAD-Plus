@@ -15,10 +15,24 @@ const VERSION = "0.1.0";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
-const ICON_VOD = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/vod/1599440449/icon";
-const ICON_ZOOM = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/zoom/1599440449/icon";
-const ICON_ASSIGN = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/assign/1599440449/icon";
-const ICON_QUIZ = "https://smartlead.hallym.ac.kr/theme/image.php/coursemosv2/quiz/1599440449/icon";
+const URL_MAIN = "https://smartlead.hallym.ac.kr";
+
+const ICON_VOD = URL_MAIN + "/theme/image.php/coursemosv2/vod/1599440449/icon";
+const ICON_ZOOM = URL_MAIN + "/theme/image.php/coursemosv2/zoom/1599440449/icon";
+const ICON_ASSIGN = URL_MAIN + "/theme/image.php/coursemosv2/assign/1599440449/icon";
+const ICON_QUIZ = URL_MAIN + "/theme/image.php/coursemosv2/quiz/1599440449/icon";
+
+const URL_COURSE_LIST = URL_MAIN + "/local/ubion/user/";
+const URL_COURSE_MAIN = URL_MAIN + "/course/view.php?id=";
+const URL_ATTENDANCE_LIST = URL_MAIN + "/report/ubcompletion/user_progress_a.php?id=";
+const URL_ZOOM_LIST = URL_MAIN + "/mod/zoom/index.php?id=";
+const URL_ASSIGN_LIST = URL_MAIN+ "/mod/assign/index.php?id=";
+const URL_QUIZ_LIST = URL_MAIN + "/mod/quiz/index.php?id=";
+
+const URL_VOD_VIEW = URL_MAIN + "/mod/vod/viewer.php?id=";
+const URL_ZOOM_VIEW = URL_MAIN + "/mod/zoom/view.php?id=";
+const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
+const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
 const CSS = `.progress_courses .course_list_btn_group {
     font-size: 12px;
@@ -173,7 +187,7 @@ let course_data = {
 };
 
 async function ScrapCoursePage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/course/view.php?id=" + id)).text();
+    let req = await (await fetch(URL_COURSE_MAIN + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".attendance > li");
     let result = {
@@ -267,7 +281,7 @@ async function ScrapCoursePage(id) {
 }
 
 async function ScrapZoomPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/zoom/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_ZOOM_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".meeting-list tbody:not(.empty) tr");
     let result = [];
@@ -292,7 +306,7 @@ async function ScrapZoomPage(id) {
 }
 
 async function ScrapAssignPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/assign/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_ASSIGN_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -318,7 +332,7 @@ async function ScrapAssignPage(id) {
 }
 
 async function ScrapQuizPage(id) {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/mod/quiz/index.php?id=" + id)).text();
+    let req = await (await fetch(URL_QUIZ_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -347,7 +361,7 @@ async function ScrapQuizPage(id) {
 
 async function ScrapProgressPage(id) {
     let req = await (
-        await fetch("https://smartlead.hallym.ac.kr/report/ubcompletion/user_progress_a.php?id=" + id)
+        await fetch(URL_ATTENDANCE_LIST + id)
     ).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".user_progress_table tr");
@@ -400,7 +414,7 @@ async function ScrapProgressPage(id) {
 }
 
 async function ScrapListPage() {
-    let req = await (await fetch("https://smartlead.hallym.ac.kr/local/ubion/user/")).text();
+    let req = await (await fetch(URL_COURSE_LIST)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".coursefullname");
     let result = [];
@@ -569,22 +583,22 @@ function ConstructContent() {
 
         switch (item.type) {
             case 1: // 동영상 VOD
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/vod/viewer.php?id=${item.id}`);
+                node = node.replace("{{URL}}", URL_VOD_VIEW + item.id);
                 node = node.replace("{{ICON}}", ICON_VOD);
                 node = node.replace("{{ICON_ALT}}", "동영상");
                 break;
             case 2: // ZOOM 화상 강의
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/zoom/view.php?id=${item.id}`);
+                node = node.replace("{{URL}}", URL_ZOOM_VIEW + item.id);
                 node = node.replace("{{ICON}}", ICON_ZOOM);
                 node = node.replace("{{ICON_ALT}}", "화상강의");
                 break;
             case 3: // 과제
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/assign/view.php?id=${item.id}`);
+                node = node.replace("{{URL}}", URL_ASSIGN_VIEW + item.id);
                 node = node.replace("{{ICON}}", ICON_ASSIGN);
                 node = node.replace("{{ICON_ALT}}", "과제");
                 break;
             case 4: // 퀴즈
-                node = node.replace("{{URL}}", `https://smartlead.hallym.ac.kr/mod/quiz/view.php?id=${item.id}`);
+                node = node.replace("{{URL}}", URL_QUIZ_VIEW + item.id);
                 node = node.replace("{{ICON}}", ICON_QUIZ);
                 node = node.replace("{{ICON_ALT}}", "퀴즈");
                 break;
