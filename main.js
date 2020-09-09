@@ -62,7 +62,7 @@ const CSS = `.progress_courses .course_list_btn_group {
 }
 
 .plus-course-todo-sub {
-    font-size: 16px;
+    font-size: 12px;
     margin-right: 5px;
 }
 
@@ -657,17 +657,7 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        if (item.type === 1) {
-            node = node.replace(
-                "{{SUB}}",
-                `${TimeToText(item.vod_status.value)}/${TimeToText(item.vod_status.require)} (${
-                    item.progress
-                }%) 기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`
-            );
-        } else {
-            node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("YYYY.MM.DD HH:mm")}`);
-        }
-
+        node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("MM.DD HH:mm")}`);
         node = node.replace("{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음");
 
         targetNode.innerHTML += node;
