@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SmartLEAD+
 // @namespace    https://github.com/PortalCube/
-// @version      0.1.0
+// @version      0.1.1
 // @description  SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
 // @author       PortalCube@hallym
 // @match        https://smartlead.hallym.ac.kr/*
@@ -11,7 +11,7 @@
 // ==/UserScript==
 ("use strict");
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
