@@ -753,6 +753,10 @@ function MainInit() {
     }
 }
 
+function CourseInit() {
+    
+}
+
 function Init() {
     let path = location.pathname;
 
@@ -769,6 +773,9 @@ function Init() {
     switch (path) {
         case "/": // 메인 페이지
             MainInit();
+            break;
+        case "/course/view.php": // 강좌 메인 페이지
+            CourseInit();
             break;
     }
 }
