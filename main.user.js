@@ -350,17 +350,26 @@ async function ScrapQuizPage(id) {
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
 
+    let week = 0;
+
     for (let node of nodeList) {
         let cellList = node.querySelectorAll("td");
 
         REGEX_WEEK.lastIndex = 0;
 
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
+        
         let data = {
             id: parseInt(cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]),
-            week: parseInt(dateRegex[1]),
+            week: 0,
             name: cellList[1].textContent
         };
+
+        if (dateRegex) {
+            week = parseInt(dateRegex[1]);
+        }
+
+        data.week = week;
 
         if (cellList.length == 4) {
             data.date = moment(cellList[2].textContent).format();
