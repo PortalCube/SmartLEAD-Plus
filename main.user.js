@@ -480,9 +480,6 @@ async function UpdateData() {
         let assign = await ScrapAssignPage(course.id);
         let quiz = await ScrapQuizPage(course.id);
 
-        console.log(data);
-        console.log(progress);
-
         // 각각의 페이지에서 가져온 데이터들을 merge
         for (let act of data.act) {
             let item;
