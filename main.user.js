@@ -354,7 +354,7 @@ async function ScrapQuizPage(id) {
 
     for (let node of nodeList) {
         let cellList = node.querySelectorAll("td");
-
+        
         REGEX_WEEK.lastIndex = 0;
 
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
@@ -477,13 +477,21 @@ async function UpdateData() {
             switch (act.type) {
                 case 1: // 동영상 VOD
                     item = _.find(progress, { name: act.name });
-                    act.complete = item.complete;
-                    act.vod_status = item.time;
-                    if (item.done) {
-                        act.progress = 100;
+
+                    if (item) {
+                        act.complete = item.complete;
+                        act.vod_status = item.time;
+                        if (item.done) {
+                            act.progress = 100;
+                        } else {
+                            act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
+                        }
                     } else {
-                        act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
+                        act.complete = false;
+                        act.vod_status = 0;
+                        act.progress = 0;
                     }
+
                     break;
                 case 2: // ZOOM 화상 강의
                     item = _.find(zoom, { id: act.id });
