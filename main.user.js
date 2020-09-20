@@ -243,8 +243,8 @@ async function ScrapCoursePage(id) {
         let weekRegex = REGEX_WEEK.exec(weekText);
         let weekData = {
             week: parseInt(weekRegex[1]),
-            start: moment([course_year, parseInt(weekRegex[2]) - 1, parseInt(weekRegex[3])]).format(),
-            end: moment([course_year, parseInt(weekRegex[4]) - 1, parseInt(weekRegex[5])]).format()
+            start: moment([course_year, parseInt(weekRegex[2]) - 1, parseInt(weekRegex[3]), 0, 0, 0]).format(),
+            end: moment([course_year, parseInt(weekRegex[4]) - 1, parseInt(weekRegex[5]), 23, 59, 59]).format()
         };
 
         result.week.push(weekData);
