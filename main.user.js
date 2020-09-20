@@ -354,11 +354,11 @@ async function ScrapQuizPage(id) {
 
     for (let node of nodeList) {
         let cellList = node.querySelectorAll("td");
-        
+
         REGEX_WEEK.lastIndex = 0;
 
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
-        
+
         let data = {
             id: parseInt(cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]),
             week: 0,
@@ -385,7 +385,10 @@ async function ScrapProgressPage(id) {
     let req = await (await fetch(URL_ATTENDANCE_LIST + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".user_progress_table tr");
-    let result = [];
+    let result = {
+        vod_status: [],
+        week_status: []
+    };
     let skipFirst = true;
 
     let week = 0;
@@ -407,10 +410,16 @@ async function ScrapProgressPage(id) {
         }
 
         if (childNodeList.length > 4) {
+            week = parseInt(childNodeList[0].textContent);
+
+            result.week_status.push({
+                week: week,
+                complete: childNodeList[5].firstChild.textContent.trim() === "O"
+            });
+
             if (!childNodeList[1].classList.contains("text-left")) {
                 continue;
             }
-            week = parseInt(childNodeList[0].textContent);
             data.name = childNodeList[1].textContent.trim();
             data.time.require = TextToTime(childNodeList[2].textContent);
             data.time.value = TextToTime(childNodeList[3].firstChild.textContent.trim());
@@ -427,7 +436,7 @@ async function ScrapProgressPage(id) {
 
         data.week = week;
 
-        result.push(data);
+        result.vod_status.push(data);
     }
 
     return result;
@@ -471,24 +480,34 @@ async function UpdateData() {
         let assign = await ScrapAssignPage(course.id);
         let quiz = await ScrapQuizPage(course.id);
 
+        console.log(data);
+        console.log(progress);
+
         // 각각의 페이지에서 가져온 데이터들을 merge
         for (let act of data.act) {
             let item;
             switch (act.type) {
                 case 1: // 동영상 VOD
-                    item = _.find(progress, { name: act.name });
+                    item = _.find(progress.vod_status, { name: act.name });
+                    week_item = _.find(progress.week_status, { week: act.week });
 
                     if (item) {
                         act.complete = item.complete;
                         act.vod_status = item.time;
-                        if (item.done) {
-                            act.progress = 100;
-                        } else {
-                            act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
-                        }
+                        act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
+                    } else if (week_item) {
+                        act.complete = week_item.complete;
+                        act.vod_status = {
+                            require: 0,
+                            value: 0
+                        };
+                        act.progress = week_item.complete ? 100 : 0;
                     } else {
                         act.complete = false;
-                        act.vod_status = 0;
+                        act.vod_status = {
+                            require: 0,
+                            value: 0
+                        };
                         act.progress = 0;
                     }
 
