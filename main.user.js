@@ -10,6 +10,7 @@
 // @match        https://smartlead.hallym.ac.kr/*
 // @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
 // @require      https://momentjs.com/downloads/moment-with-locales.min.js
+// @require      https://cdn.jsdelivr.net/npm/axios@0.20.0/dist/axios.min.js
 // @grant        GM_addStyle
 // ==/UserScript==
 ("use strict");
