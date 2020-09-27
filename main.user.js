@@ -213,7 +213,7 @@ let course_data = {
 };
 
 async function ScrapCoursePage(id) {
-    let req = await (await fetch(URL_COURSE_MAIN + id)).text();
+    let req = (await axios(URL_COURSE_MAIN + id)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".attendance > li");
     let result = {
@@ -307,7 +307,7 @@ async function ScrapCoursePage(id) {
 }
 
 async function ScrapZoomPage(id) {
-    let req = await (await fetch(URL_ZOOM_LIST + id)).text();
+    let req = (await axios(URL_ZOOM_LIST + id)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".meeting-list tbody:not(.empty) tr");
     let result = [];
@@ -332,7 +332,7 @@ async function ScrapZoomPage(id) {
 }
 
 async function ScrapAssignPage(id) {
-    let req = await (await fetch(URL_ASSIGN_LIST + id)).text();
+    let req = (await axios(URL_ASSIGN_LIST + id)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -358,7 +358,7 @@ async function ScrapAssignPage(id) {
 }
 
 async function ScrapQuizPage(id) {
-    let req = await (await fetch(URL_QUIZ_LIST + id)).text();
+    let req = (await axios(URL_QUIZ_LIST + id)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
@@ -395,7 +395,7 @@ async function ScrapQuizPage(id) {
 }
 
 async function ScrapProgressPage(id) {
-    let req = await (await fetch(URL_ATTENDANCE_LIST + id)).text();
+    let req = (await axios(URL_ATTENDANCE_LIST + id)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".user_progress_table tr");
     let result = {
@@ -456,7 +456,7 @@ async function ScrapProgressPage(id) {
 }
 
 async function ScrapListPage() {
-    let req = await (await fetch(URL_COURSE_LIST)).text();
+    let req = (await axios(URL_COURSE_LIST)).data;
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".coursefullname");
     let result = [];
