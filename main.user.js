@@ -9,7 +9,7 @@
 // @updateURL    https://github.com/PortalCube/SmartLEAD-Plus/raw/master/main.user.js
 // @match        https://smartlead.hallym.ac.kr/*
 // @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
-// @require      https://momentjs.com/downloads/moment-with-locales.min.js
+// @require      https://cdn.jsdelivr.net/npm/moment@2.29.0/min/moment-with-locales.js
 // @grant        GM_addStyle
 // ==/UserScript==
 ("use strict");
