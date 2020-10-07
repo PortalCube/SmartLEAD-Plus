@@ -37,7 +37,48 @@ const URL_ZOOM_VIEW = URL_MAIN + "/mod/zoom/view.php?id=";
 const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
 const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
-const CSS = `.progress_courses .course_list_btn_group {
+const CSS = `
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 700;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix) format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf) format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 400;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf) format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 300;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix) format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf) format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 800;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf) format("truetype");
+}
+
+.progress_courses .course_list_btn_group {
     float: none !important;
     font-size: 12px;
     font-weight: normal;
@@ -788,7 +829,7 @@ function MainInit() {
 
     document.querySelector("#plus-course-refresh-btn").onclick = function () {
         UpdateData();
-    }
+    };
 
     ConstructContent();
 
