@@ -38,8 +38,7 @@ const URL_ZOOM_VIEW = URL_MAIN + "/mod/zoom/view.php?id=";
 const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
 const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
-const CSS = `
-@font-face {
+const CSS = `@font-face {
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 300;
@@ -179,6 +178,17 @@ const CSS = `
 .plus-course-percent-text.level4 {
     color: #0cad32;
 }
+
+.plus-act-incomplete-text {
+    border-radius: 8px;
+    padding: 2px 6px;
+    background-color: #d60878;
+    color: #ffffff;
+}
+
+.plus-hide {
+    display: none;
+}
 `;
 
 const HTML_BTNGROUP = `<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
@@ -242,7 +252,7 @@ const HTML_TODO = `<li class="course_label_re_03">
     </div>
 </li>`;
 const HTML_ACT_INFO = `<span class="displayoptions"
-><span class="text-ubstrap">&nbsp;{{STATUS}}&nbsp;<span class="text-late">{{PROGRESS}}</span></span
+><span class="text-ubstrap">&nbsp;<span class="{{STATUS}}">미완료</span>&nbsp;<span class="text-late">{{PROGRESS}}</span></span
 ><span class="text-info">&nbsp;{{DATE}}</span></span
 >`;
 
@@ -872,7 +882,7 @@ function CourseInit() {
             continue;
         }
 
-        html = html.replace("{{STATUS}}", (act.complete ? "" : "미") + "완료");
+        html = html.replace("{{STATUS}}", act.complete ? "plus-hide" : "plus-act-incomplete-text");
 
         if (act.type === 1) {
             html = html.replace("{{PROGRESS}}", `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`);
