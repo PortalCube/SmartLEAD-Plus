@@ -834,12 +834,15 @@ function MainInit() {
 
     ConstructContent();
 
+    StatusText();
+
     // 데이터가 없거나 마지막 갱신 이후로 5분이 지나면 업데이트
-    if (course_data.lastUpdate === null || moment() - moment(course_data.lastUpdate) >= 1000 * 60 * 5) {
-        UpdateData();
-    } else {
-        StatusText();
-    }
+    // 2020. 10. 21. Update :: ZOOM 업데이트 속도가 너무 느려서 일시적으로 비활성화. 추후 속도 개선후 다시 적용 예정
+    // if (course_data.lastUpdate === null || moment() - moment(course_data.lastUpdate) >= 1000 * 60 * 5) {
+    //     UpdateData();
+    // } else {
+    //     StatusText();
+    // }
 }
 
 function CourseInit() {
