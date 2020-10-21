@@ -43,7 +43,7 @@ const CSS = `
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 300;
-    src: local("NanumGothic Light"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot),
+    src: local("NanumGothic"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix) format("embedded-opentype"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff) format("woff"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf) format("truetype");
@@ -53,7 +53,7 @@ const CSS = `
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 400;
-    src: local("NanumGothic Regular"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot),
+    src: local("NanumGothic"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix) format("embedded-opentype"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff) format("woff"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf) format("truetype");
@@ -63,7 +63,7 @@ const CSS = `
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 500;
-    src: local("NanumGothic Bold"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot),
+    src: local("NanumGothic"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix) format("embedded-opentype"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff) format("woff"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf) format("truetype");
@@ -73,7 +73,7 @@ const CSS = `
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 700;
-    src: local("NanumGothic ExtraBold"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot),
+    src: local("NanumGothic"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix) format("embedded-opentype"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff) format("woff"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf) format("truetype");
