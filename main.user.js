@@ -874,10 +874,7 @@ function CourseInit() {
         html = html.replace("{{STATUS}}", (act.complete ? "" : "미") + "완료");
 
         if (act.type === 1) {
-            html = html.replace(
-                "{{PROGRESS}}",
-                `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`
-            );
+            html = html.replace("{{PROGRESS}}", `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`);
         } else {
             html = html.replace("{{PROGRESS}}", `(${act.complete ? 100 : 0}%)`);
         }
