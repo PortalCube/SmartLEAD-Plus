@@ -39,42 +39,42 @@ const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
 const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
 
 const CSS = `
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 300;
+    src: local("NanumGothic Light"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix) format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 400;
+    src: local("NanumGothic Regular"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix) format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf) format("truetype");
+}
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 500;
+    src: local("NanumGothic Bold"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix) format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff) format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf) format("truetype");
+}
 
 @font-face {
     font-family: "NanumGothic";
     font-style: normal;
     font-weight: 700;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix) format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 400;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix)
-            format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 300;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix) format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 800;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix)
-            format("embedded-opentype"),
+    src: local("NanumGothic ExtraBold"), url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix) format("embedded-opentype"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff) format("woff"),
         url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf) format("truetype");
 }
@@ -164,21 +164,22 @@ const CSS = `
     margin: 0;
 }
 
-.plus-course-percent-text.level1{
+.plus-course-percent-text.level1 {
     color: #ff0000;
 }
 
-.plus-course-percent-text.level2{
+.plus-course-percent-text.level2 {
     color: #d60878;
 }
 
-.plus-course-percent-text.level3{
+.plus-course-percent-text.level3 {
     color: #ff9519;
 }
 
-.plus-course-percent-text.level4{
+.plus-course-percent-text.level4 {
     color: #0cad32;
-}`;
+}
+`;
 
 const HTML_BTNGROUP = `<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
 <button id="plus-course-todo-btn" type="button">할 일 목록</button>
