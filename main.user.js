@@ -620,6 +620,8 @@ function StatusText() {
 
     if (course_data.lastUpdate) {
         text = "마지막 데이터 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
+    } else {
+        text = "<- 버튼을 눌러서 데이터를 갱신해주세요!";
     }
 
     if (course_data.isUpdating) {
