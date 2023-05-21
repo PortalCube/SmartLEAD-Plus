@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "SmartLEAD+",
+    "description": "SmartLEAD를 편리하게 만드는 기능들을 추가시킵니다.",
+    "version": "1.0.0",
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": "src/icon/icon-512.png"
+    },
+    "icons": {
+        "32": "src/icon/icon-32.png",
+        "48": "src/icon/icon-48.png",
+        "128": "src/icon/icon-128.png",
+        "256": "src/icon/icon-256.png",
+        "512": "src/icon/icon-512.png"
+    },
+    "content_scripts": [
+        {
+            "js": ["src/script/main.js"],
+            "matches": ["https://smartlead.hallym.ac.kr/*"]
+        }
+    ]
+}

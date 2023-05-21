@@ -1,20 +1,12 @@
-// ==UserScript==
-// @name         SmartLEAD+
-// @namespace    https://github.com/PortalCube/
-// @version      0.1.2
-// @description  SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
-// @author       PortalCube@hallym
-// @homepageURL  https://github.com/PortalCube/SmartLEAD-Plus
-// @downloadURL  https://github.com/PortalCube/SmartLEAD-Plus/raw/master/main.user.js
-// @updateURL    https://github.com/PortalCube/SmartLEAD-Plus/raw/master/main.user.js
-// @match        https://smartlead.hallym.ac.kr/*
-// @require      https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js
-// @require      https://momentjs.com/downloads/moment-with-locales.min.js
-// @grant        GM_addStyle
-// ==/UserScript==
-("use strict");
+"use strict";
 
-const VERSION = "0.1.2";
+import "./style.css";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/ko";
+import _ from "lodash";
+
+const VERSION = "1.0.0-beta1";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
@@ -36,148 +28,6 @@ const URL_VOD_VIEW = URL_MAIN + "/mod/vod/viewer.php?id=";
 const URL_ZOOM_VIEW = URL_MAIN + "/mod/zoom/view.php?id=";
 const URL_ASSIGN_VIEW = URL_MAIN + "/mod/assign/view.php?id=";
 const URL_QUIZ_VIEW = URL_MAIN + "/mod/quiz/view.php?id=";
-
-const CSS = `
-
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 700;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix) format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 400;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix)
-            format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 300;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix) format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf) format("truetype");
-}
-@font-face {
-    font-family: "NanumGothic";
-    font-style: normal;
-    font-weight: 800;
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot);
-    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix)
-            format("embedded-opentype"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff) format("woff"),
-        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf) format("truetype");
-}
-
-.progress_courses .course_list_btn_group {
-    float: none !important;
-    font-size: 12px;
-    font-weight: normal;
-}
-
-.plus-round-icon-btn {
-    padding: 4px 4px 0px 4px;
-    border-radius: 20px;
-}
-
-#plus-data-status {
-    font-size: 12px;
-    margin-right: 10px;
-}
-
-.plus-progress-back {
-    width: 100%;
-    border-radius: 4px;
-    background-color: #e0e0e0;
-}
-
-.plus-progress-front {
-    height: 8px;
-    border-radius: 4px;
-    background-color: #ff9519;
-}
-
-.plus-todo-icon {
-    margin-right: 8px;
-}
-
-.plus-course-todo-sub {
-    font-size: 12px;
-    margin-right: 5px;
-}
-
-.plus-course-todo-main {
-    font-size: 16px;
-    font-weight: 700;
-}
-
-.progress_courses .course_lists .my-course-lists.smartlead_plus a {
-    padding: 6px 8px;
-}
-
-.progress_courses .course_lists .my-course-lists.smartlead_plus .course-name {
-    margin-left: 0;
-}
-
-.my-course-lists.smartlead_plus .course-name .course-title {
-    margin-left: 0;
-}
-
-.plus-course-top {
-    display: flex;
-    line-height: 24px;
-    justify-content: space-between;
-}
-
-.plus-course-progress {
-    margin-top: 4px;
-}
-
-.progress_courses .course_lists .my-course-lists .course-name p {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #000;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    line-height: 24px;
-}
-
-.progress_courses .course_lists .my-course-lists .course-name .prof {
-    font-weight: normal;
-    margin-left: 4px;
-}
-
-.plus-course-percent-text {
-    font-size: 16pt;
-    margin: 0;
-}
-
-.plus-course-percent-text.level1{
-    color: #ff0000;
-}
-
-.plus-course-percent-text.level2{
-    color: #d60878;
-}
-
-.plus-course-percent-text.level3{
-    color: #ff9519;
-}
-
-.plus-course-percent-text.level4{
-    color: #0cad32;
-}`;
 
 const HTML_BTNGROUP = `<button id="plus-course-all-btn" type="button">강좌 전체보기</button>
 <button id="plus-course-todo-btn" type="button">할 일 목록</button>
@@ -218,7 +68,7 @@ const HTML_SUMMARY = `<li class="course_label_re_03">
 `;
 const HTML_TODO = `<li class="course_label_re_03">
     <div class="course_box">
-        <a href="{{URL}}" class="course_link">
+        <a href="{{URL}}" class="course_link" target="_blank">
             <div class="plus-course-top">
                 <div class="course-name">
                     <div class="course-title">
@@ -244,7 +94,7 @@ const HTML_ACT_INFO = `<span class="displayoptions"
 ><span class="text-info">&nbsp;{{DATE}}</span></span
 >`;
 
-let course_year = moment().year();
+let course_year = dayjs().year();
 let course_week = 0;
 let course_data = {
     data: [],
@@ -288,16 +138,40 @@ async function ScrapCoursePage(id) {
 
     // 강의 활동 정보 체크 및 각 주차별 기간 체크
     for (let weekNode of nodeList) {
-        let actNodeList = weekNode.querySelectorAll(".total_sections .activity:not(.label)");
+        let actNodeList = weekNode.querySelectorAll(
+            ".total_sections .activity:not(.label)"
+        );
 
         REGEX_WEEK.lastIndex = 0;
 
         let weekText = weekNode.getAttribute("aria-label");
+        console.log(weekNode);
+
+        if (REGEX_WEEK.test(weekText) === false) {
+            continue;
+        }
+
+        REGEX_WEEK.lastIndex = 0;
+
         let weekRegex = REGEX_WEEK.exec(weekText);
         let weekData = {
             week: parseInt(weekRegex[1]),
-            start: moment([course_year, parseInt(weekRegex[2]) - 1, parseInt(weekRegex[3]), 0, 0, 0]).format(),
-            end: moment([course_year, parseInt(weekRegex[4]) - 1, parseInt(weekRegex[5]), 23, 59, 59]).format()
+            start: dayjs([
+                course_year,
+                parseInt(weekRegex[2]) - 1,
+                parseInt(weekRegex[3]),
+                0,
+                0,
+                0
+            ]).format(),
+            end: dayjs([
+                course_year,
+                parseInt(weekRegex[4]) - 1,
+                parseInt(weekRegex[5]),
+                23,
+                59,
+                59
+            ]).format()
         };
 
         result.week.push(weekData);
@@ -317,11 +191,13 @@ async function ScrapCoursePage(id) {
             if (node.classList.contains("vod")) {
                 data.type = 1;
                 if (node.querySelector(".text-ubstrap")) {
-                    let dateText = node.querySelector(".text-ubstrap").firstChild.textContent.trim();
+                    let dateText = node
+                        .querySelector(".text-ubstrap")
+                        .firstChild.textContent.trim();
                     let dateArray = dateText.split(" ~ ");
                     data.schedule = {
-                        start: moment(dateArray[0]).format(),
-                        end: moment(dateArray[1]).format()
+                        start: dayjs(dateArray[0]).format(),
+                        end: dayjs(dateArray[1]).format()
                     };
                 } else {
                     data.schedule = {
@@ -359,10 +235,12 @@ async function ScrapZoomPage(id) {
 
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
         let data = {
-            id: parseInt(cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]),
+            id: parseInt(
+                cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]
+            ),
             week: parseInt(dateRegex[1]),
             name: cellList[1].textContent,
-            date: moment(cellList[2].textContent).format()
+            date: dayjs(cellList[2].textContent).format()
         };
 
         result.push(data);
@@ -384,10 +262,12 @@ async function ScrapAssignPage(id) {
 
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
         let data = {
-            id: parseInt(cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]),
+            id: parseInt(
+                cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]
+            ),
             week: parseInt(dateRegex[1]),
             name: cellList[1].textContent,
-            date: moment(cellList[2].textContent).format(),
+            date: dayjs(cellList[2].textContent).format(),
             complete: cellList[3].textContent === "제출 완료"
         };
 
@@ -413,7 +293,9 @@ async function ScrapQuizPage(id) {
         let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
 
         let data = {
-            id: parseInt(cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]),
+            id: parseInt(
+                cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]
+            ),
             week: 0,
             name: cellList[1].textContent
         };
@@ -425,7 +307,7 @@ async function ScrapQuizPage(id) {
         data.week = week;
 
         if (cellList.length == 4) {
-            data.date = moment(cellList[2].textContent).format();
+            data.date = dayjs(cellList[2].textContent).format();
         }
 
         result.push(data);
@@ -535,7 +417,7 @@ async function UpdateData() {
 
         // 각각의 페이지에서 가져온 데이터들을 merge
         for (let act of data.act) {
-            let item;
+            let item, week_item;
             switch (act.type) {
                 case 1: // 동영상 VOD
                     item = _.find(progress.vod_status, { name: act.name });
@@ -544,7 +426,10 @@ async function UpdateData() {
                     if (item) {
                         act.complete = item.complete;
                         act.vod_status = item.time;
-                        act.progress = _.min([100, Math.round((item.time.value / item.time.require) * 100)]);
+                        act.progress = _.min([
+                            100,
+                            Math.round((item.time.value / item.time.require) * 100)
+                        ]);
                     } else if (week_item) {
                         act.complete = week_item.complete;
                         act.vod_status = {
@@ -568,7 +453,7 @@ async function UpdateData() {
                         start: null,
                         end: item.date
                     };
-                    act.complete = moment(item.date) < moment();
+                    act.complete = dayjs(item.date) < dayjs();
                     break;
                 case 3: // 과제
                     item = _.find(assign, { id: act.id });
@@ -584,7 +469,7 @@ async function UpdateData() {
                         start: null,
                         end: item.date
                     };
-                    act.complete = moment(item.date) < moment();
+                    act.complete = dayjs(item.date) < dayjs();
                     break;
             }
 
@@ -606,7 +491,7 @@ async function UpdateData() {
 
     course_data.data = result;
     course_data.isUpdating = false;
-    course_data.lastUpdate = moment().format();
+    course_data.lastUpdate = dayjs().format();
 
     localStorage.setItem("course_data_v1", JSON.stringify(course_data));
 
@@ -618,7 +503,9 @@ function StatusText() {
     let text = "";
 
     if (course_data.lastUpdate) {
-        text = "마지막 데이터 갱신: " + moment(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
+        text =
+            "마지막 데이터 갱신: " +
+            dayjs(course_data.lastUpdate).format("YYYY.MM.DD HH:mm:ss");
     }
 
     if (course_data.isUpdating) {
@@ -675,10 +562,10 @@ function ConstructContent() {
         return;
     }
 
-    let now = moment();
+    let now = dayjs();
 
     for (let item of course_data.data[0].week) {
-        if (moment(item.start) < now && now < moment(item.end)) {
+        if (dayjs(item.start) < now && now < dayjs(item.end)) {
             course_week = item.week;
         }
     }
@@ -693,7 +580,7 @@ function ConstructContent() {
 
     for (let course of course_data.data) {
         for (let act of course.act) {
-            let endTime = moment(act.schedule.end);
+            let endTime = dayjs(act.schedule.end);
 
             if (!act.complete && endTime > now) {
                 todoList.push(act);
@@ -702,7 +589,7 @@ function ConstructContent() {
     }
 
     todoList = _.sortBy(todoList, function (o) {
-        return moment(o.schedule.end);
+        return dayjs(o.schedule.end);
     });
 
     for (let item of todoList) {
@@ -732,7 +619,7 @@ function ConstructContent() {
                 break;
         }
 
-        let timeLeft = (moment(item.schedule.end) - now) / 3600000; // 1시간 단위
+        let timeLeft = (dayjs(item.schedule.end) - now) / 3600000; // 1시간 단위
         if (timeLeft < 24) {
             // 1일
             node = node.replace("{{LEVEL}}", 1);
@@ -746,8 +633,15 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        node = node.replace("{{SUB}}", `기한: ${moment(item.schedule.end).format("MM.DD HH:mm")}`);
-        node = node.replace("{{MAIN}}", now.from(moment(item.schedule.end), true) + " 남음");
+        node = node.replace(
+            "{{SUB}}",
+            `기한: ${dayjs(item.schedule.end).format("MM.DD HH:mm")}`
+        );
+
+        node = node.replace(
+            "{{MAIN}}",
+            now.from(dayjs(item.schedule.end), true) + " 남음"
+        );
 
         targetNode.innerHTML += node;
     }
@@ -787,7 +681,10 @@ function ConstructContent() {
             node = node.replace("{{LEVEL}}", 4);
         }
 
-        node = node.replace("{{PERCENT}}", `${item.percent}% (${item.complete}/${item.total})`);
+        node = node.replace(
+            "{{PERCENT}}",
+            `${item.percent}% (${item.complete}/${item.total})`
+        );
         node = node.replace("{{PROGRESS}}", item.percent + "%");
 
         targetNode.innerHTML += node;
@@ -806,7 +703,7 @@ function LoadContent(target) {
 
 function MainInit() {
     let btnGroup = document.querySelector(".course_list_btn_group");
-    btnGroup.innerHTML = HTML_BTNGROUP.replace("{{VERSION}}", VERSION);
+    btnGroup.innerHTML = HTML_BTNGROUP;
 
     document.querySelector(".course_lists").setAttribute("id", "course-all");
 
@@ -834,7 +731,10 @@ function MainInit() {
     ConstructContent();
 
     // 데이터가 없거나 마지막 갱신 이후로 5분이 지나면 업데이트
-    if (course_data.lastUpdate === null || moment() - moment(course_data.lastUpdate) >= 1000 * 60 * 5) {
+    if (
+        course_data.lastUpdate === null ||
+        dayjs() - dayjs(course_data.lastUpdate) >= 1000 * 60 * 5
+    ) {
         UpdateData();
     } else {
         StatusText();
@@ -870,13 +770,18 @@ function CourseInit() {
         if (act.type === 1) {
             html = html.replace(
                 "{{PROGRESS}}",
-                `${TimeToText(act.vod_status.value)}/${TimeToText(act.vod_status.require)} (${act.progress}%)`
+                `${TimeToText(act.vod_status.value)}/${TimeToText(
+                    act.vod_status.require
+                )} (${act.progress}%)`
             );
         } else {
             html = html.replace("{{PROGRESS}}", `(${act.complete ? 100 : 0}%)`);
         }
 
-        html = html.replace("{{DATE}}", `기한: ${moment(act.schedule.end).format("YYYY.MM.DD HH:mm")}`);
+        html = html.replace(
+            "{{DATE}}",
+            `기한: ${dayjs(act.schedule.end).format("YYYY.MM.DD HH:mm")}`
+        );
 
         if (node.querySelector(".displayoptions")) {
             // 기존 텍스트는 삭제.
@@ -890,9 +795,8 @@ function CourseInit() {
 function Init() {
     let path = location.pathname;
 
-    moment.locale("ko");
-
-    GM_addStyle(CSS);
+    dayjs.extend(relativeTime);
+    dayjs.locale("ko");
 
     let saved_course_data = localStorage.getItem("course_data_v1");
 

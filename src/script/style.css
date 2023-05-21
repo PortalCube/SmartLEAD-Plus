@@ -1,0 +1,149 @@
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 700;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf)
+            format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 400;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf)
+            format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 300;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf)
+            format("truetype");
+}
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 800;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf)
+            format("truetype");
+}
+
+.progress_courses .course_list_btn_group {
+    float: none !important;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+.plus-round-icon-btn {
+    padding: 4px 4px 0px 4px;
+    border-radius: 20px;
+}
+
+#plus-data-status {
+    font-size: 12px;
+    margin-right: 10px;
+}
+
+.plus-progress-back {
+    width: 100%;
+    border-radius: 4px;
+    background-color: #e0e0e0;
+}
+
+.plus-progress-front {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #ff9519;
+}
+
+.plus-todo-icon {
+    margin-right: 8px;
+}
+
+.plus-course-todo-sub {
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.plus-course-todo-main {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.progress_courses .course_lists .my-course-lists.smartlead_plus a {
+    padding: 6px 8px;
+}
+
+.progress_courses .course_lists .my-course-lists.smartlead_plus .course-name {
+    margin-left: 0;
+}
+
+.my-course-lists.smartlead_plus .course-name .course-title {
+    margin-left: 0;
+}
+
+.plus-course-top {
+    display: flex;
+    line-height: 24px;
+    justify-content: space-between;
+}
+
+.plus-course-progress {
+    margin-top: 4px;
+}
+
+.progress_courses .course_lists .my-course-lists .course-name p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 24px;
+}
+
+.progress_courses .course_lists .my-course-lists .course-name .prof {
+    font-weight: normal;
+    margin-left: 4px;
+}
+
+.plus-course-percent-text {
+    font-size: 16pt;
+    margin: 0;
+}
+
+.plus-course-percent-text.level1 {
+    color: #ff0000;
+}
+
+.plus-course-percent-text.level2 {
+    color: #d60878;
+}
+
+.plus-course-percent-text.level3 {
+    color: #ff9519;
+}
+
+.plus-course-percent-text.level4 {
+    color: #0cad32;
+}
