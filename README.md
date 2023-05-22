@@ -1,2 +1,7 @@
 # SmartLEAD-Plus
-SmartLEAD를 더욱 Smart하게 만들어주는 확장스크립트입니다.
+
+<div align="center">
+  <img src="https://github.com/PortalCube/SmartLEAD-Plus/assets/35104213/dc2d2b84-a277-428f-9126-c3789739964b" width="360" />
+</div>
+
+SmartLEAD에 편리한 기능을 추가하는 크롬 확장프로그램입니다.
