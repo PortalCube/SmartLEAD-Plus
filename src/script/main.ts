@@ -3,10 +3,12 @@
 import "./style.css";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import arraySupport from "dayjs/plugin/arraySupport";
+import objectSupport from "dayjs/plugin/objectSupport";
 import "dayjs/locale/ko";
 import _ from "lodash";
 
-const VERSION = "1.0.0-beta1";
+import { ScrapCoursePage2 } from "./crawler/course";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
@@ -103,6 +105,7 @@ let course_data = {
 };
 
 async function ScrapCoursePage(id) {
+    console.log(await ScrapCoursePage2(id));
     let req = await (await fetch(URL_COURSE_MAIN + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".attendance > li");
@@ -145,7 +148,7 @@ async function ScrapCoursePage(id) {
         REGEX_WEEK.lastIndex = 0;
 
         let weekText = weekNode.getAttribute("aria-label");
-        console.log(weekNode);
+        // console.log(weekNode);
 
         if (REGEX_WEEK.test(weekText) === false) {
             continue;
@@ -162,6 +165,7 @@ async function ScrapCoursePage(id) {
                 parseInt(weekRegex[3]),
                 0,
                 0,
+                0,
                 0
             ]).format(),
             end: dayjs([
@@ -170,7 +174,8 @@ async function ScrapCoursePage(id) {
                 parseInt(weekRegex[5]),
                 23,
                 59,
-                59
+                59,
+                0
             ]).format()
         };
 
@@ -255,12 +260,16 @@ async function ScrapAssignPage(id) {
     let nodeList = doc.querySelectorAll("table tbody:not(.empty) tr[class]");
     let result = [];
 
+    let dateRegex;
+
     for (let node of nodeList) {
         let cellList = node.querySelectorAll("td");
 
-        REGEX_WEEK.lastIndex = 0;
+        if (cellList[0].textContent) {
+            REGEX_WEEK.lastIndex = 0;
+            dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
+        }
 
-        let dateRegex = REGEX_WEEK.exec(cellList[0].textContent);
         let data = {
             id: parseInt(
                 cellList[1].querySelector("a").getAttribute("href").split("?id=")[1]
@@ -489,11 +498,13 @@ async function UpdateData() {
         result.push(data);
     }
 
+    console.log(result);
+
     course_data.data = result;
     course_data.isUpdating = false;
     course_data.lastUpdate = dayjs().format();
 
-    localStorage.setItem("course_data_v1", JSON.stringify(course_data));
+    await chrome.storage.local.set({ course_data_v1: course_data });
 
     StatusText();
     ConstructContent();
@@ -702,8 +713,8 @@ function LoadContent(target) {
 }
 
 function MainInit() {
-    let btnGroup = document.querySelector(".course_list_btn_group");
-    btnGroup.innerHTML = HTML_BTNGROUP;
+    let buttonGroup = document.querySelector(".course_list_btn_group");
+    buttonGroup.innerHTML = HTML_BTNGROUP;
 
     document.querySelector(".course_lists").setAttribute("id", "course-all");
 
@@ -792,19 +803,23 @@ function CourseInit() {
     }
 }
 
-function Init() {
-    let path = location.pathname;
-
+(async function () {
+    // DayJS 플러그인 삽입 및 언어 설정
+    // TODO: 스마트리드가 지원하는 모든 언어들의 지원 추가하기 (영어, 일본어, ...)
     dayjs.extend(relativeTime);
+    dayjs.extend(arraySupport);
+    dayjs.extend(objectSupport);
     dayjs.locale("ko");
 
-    let saved_course_data = localStorage.getItem("course_data_v1");
+    let storageData = await chrome.storage.local.get(["course_data_v1"]);
 
-    if (saved_course_data) {
-        course_data = JSON.parse(saved_course_data);
+    if (storageData["course_data_v1"]) {
+        course_data = storageData["course_data_v1"];
     }
 
-    switch (path) {
+    console.log(course_data);
+
+    switch (location.pathname) {
         case "/": // 메인 페이지
             MainInit();
             break;
@@ -812,6 +827,4 @@ function Init() {
             CourseInit();
             break;
     }
-}
-
-Init();
+})();

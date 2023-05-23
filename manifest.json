@@ -14,9 +14,10 @@
         "256": "src/icon/icon-256.png",
         "512": "src/icon/icon-512.png"
     },
+    "permissions": ["storage"],
     "content_scripts": [
         {
-            "js": ["src/script/main.js"],
+            "js": ["src/script/main.ts"],
             "matches": ["https://smartlead.hallym.ac.kr/*"]
         }
     ]
