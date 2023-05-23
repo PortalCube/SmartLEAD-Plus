@@ -80,17 +80,26 @@
 }
 
 .plus-course-todo-sub {
-    font-size: 12px;
+    font-size: 8pt;
     margin-right: 5px;
 }
 
 .plus-course-todo-main {
-    font-size: 16px;
+    /* display: block; */
+    display: inline-block;
+    width: 100px;
+    text-align: right;
+    font-size: 12pt;
     font-weight: 700;
 }
 
 .progress_courses .course_lists .my-course-lists.smartlead_plus a {
-    padding: 6px 8px;
+    padding: 8px 12px;
+    transition: background-color 0.1s;
+}
+
+.progress_courses .course_lists .my-course-lists.smartlead_plus a:hover {
+    background-color: #efefef;
 }
 
 .progress_courses .course_lists .my-course-lists.smartlead_plus .course-name {
@@ -130,6 +139,9 @@
 .plus-course-percent-text {
     font-size: 16pt;
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .plus-course-percent-text.level1 {
