@@ -8,7 +8,7 @@ import objectSupport from "dayjs/plugin/objectSupport";
 import "dayjs/locale/ko";
 import _ from "lodash";
 
-import { ScrapCoursePage2 } from "./crawler/course";
+import { CourseManager } from "./course-manager";
 
 const REGEX_WEEK = /^(\d{1,2})주차 \[(\d{1,2})월(\d{1,2})일 - (\d{1,2})월(\d{1,2})일\]$/g;
 
@@ -105,7 +105,6 @@ let course_data = {
 };
 
 async function ScrapCoursePage(id) {
-    console.log(await ScrapCoursePage2(id));
     let req = await (await fetch(URL_COURSE_MAIN + id)).text();
     let doc = new DOMParser().parseFromString(req, "text/html");
     let nodeList = doc.querySelectorAll(".attendance > li");
@@ -827,4 +826,7 @@ function CourseInit() {
             CourseInit();
             break;
     }
+
+    await CourseManager.Refresh();
+    console.log(CourseManager.data);
 })();

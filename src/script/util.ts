@@ -50,6 +50,14 @@ export type Activity = {
         require: Number | null;
         watched: Number | null;
     };
+    quiz?: {
+        attempt: {
+            total: Number;
+            left: Number;
+        };
+        inProgress: boolean;
+        timeLimit: Number;
+    };
 };
 
 export type Section = {
@@ -64,6 +72,7 @@ export type Section = {
 export type Course = {
     id: Number;
     name: string;
+    owner: string;
     isRegular: boolean;
     sections: Section[];
 };
