@@ -17,7 +17,7 @@
     "permissions": ["storage"],
     "content_scripts": [
         {
-            "js": ["src/script/main.ts", "src/script/legacy.ts"],
+            "js": ["src/script/main.ts"],
             "matches": ["https://smartlead.hallym.ac.kr/*"]
         }
     ]
