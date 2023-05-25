@@ -1,0 +1,37 @@
+@import "./variables";
+
+@mixin small-above {
+    @media (min-width: #{$breakpoint-small}) {
+        @content;
+    }
+}
+
+@mixin medium-above {
+    @media (min-width: #{$breakpoint-medium}) {
+        @content;
+    }
+}
+
+@mixin large-above {
+    @media (min-width: #{$breakpoint-large}) {
+        @content;
+    }
+}
+
+@mixin small-below {
+    @media (max-width: #{$breakpoint-small - 1px}) {
+        @content;
+    }
+}
+
+@mixin medium-below {
+    @media (max-width: #{$breakpoint-medium - 1px}) {
+        @content;
+    }
+}
+
+@mixin large-below {
+    @media (max-width: #{$breakpoint-large - 1px}) {
+        @content;
+    }
+}
