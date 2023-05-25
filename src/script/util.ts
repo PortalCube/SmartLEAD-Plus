@@ -118,3 +118,9 @@ export function DurationToSecond(text: string) {
             0
         );
 }
+
+export function StringToNode(html: string) {
+    const node = document.createElement("template");
+    node.innerHTML = html.trim();
+    return node.content.childNodes;
+}
