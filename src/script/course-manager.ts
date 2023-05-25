@@ -1,3 +1,4 @@
+"use strict";
 import {
     GetDOMPage,
     GetWeekDate,
@@ -11,10 +12,12 @@ import {
 } from "./util";
 import dayjs from "dayjs";
 
+const _latestRefresh: string | null = null;
 const courses: Course[] = [];
 
 export const CourseManager = {
     _refreshing: false,
+    _latestRefresh,
 
     courses,
 
@@ -36,13 +39,26 @@ export const CourseManager = {
         return activitys;
     },
 
-    async Save() {
-        await chrome.storage.local.set({ courses: this.courses });
+    async SaveStorage() {
+        await chrome.storage.local.set({
+            courses: this.courses,
+            latestRefresh: dayjs().format()
+        });
     },
 
-    async Load() {
-        const storage = await chrome.storage.local.get(["courses"]);
+    async LoadStorage() {
+        const storage = await chrome.storage.local.get(["courses", "latestRefresh"]);
+        this._latestRefresh = storage.latestRefresh ?? null;
         this.courses = storage.courses;
+    },
+
+    async LoadData() {
+        const now = dayjs();
+        await this.LoadStorage();
+
+        if (!this._latestRefresh || now.diff(this._latestRefresh, "minute") > 5) {
+            await this.Refresh();
+        }
     },
 
     async AuthCheck() {
@@ -56,30 +72,74 @@ export const CourseManager = {
     Correction() {
         // 후처리 과정 :: 누락된 date들 추가
 
-        // step 1. section의 누락된 date 추가
+        // 1주차 날짜
+        const date: Period = { start_date: null, end_date: null };
 
-        // 1주차 날짜 구하기
-        let firstSectionDate: Period = { start_date: null, end_date: null };
-
+        // date 구하기 :: 확실하게 날짜를 구할 수 있는 방법이 없어서
+        // 긁어온 데이터에서 날짜를 구하려고 시도
         (() => {
             for (const course of this.courses) {
                 if (!course.isRegular) {
                     continue;
                 }
                 for (const section of course.sections) {
-                    if (section.date.start_date !== null) {
-                        // 정확한 date를 포함하는 sections
+                    if (
+                        section.date.start_date !== null ||
+                        section.date.end_date !== null
+                    ) {
                         const startDate = dayjs(section.date.start_date);
                         const endDate = dayjs(section.date.end_date);
-
-                        // firstSectionDate.start_date = startDate.subtract({})
+                        date.start_date = startDate
+                            .subtract({ week: section.id - 1 })
+                            .format();
+                        date.end_date = endDate
+                            .subtract({ week: section.id - 1 })
+                            .format();
+                        return;
                     }
                 }
             }
         })();
 
+        if (!date.start_date) {
+            console.error(
+                "Correction: 보정에 실패했습니다. date 기준점을 잡을 수 없습니다."
+            );
+            return;
+        }
+
         this.courses.forEach((course) => {
-            course.sections.forEach((section) => {});
+            if (!course.isRegular) {
+                // 비교과는 날짜 제한이 없음
+                return;
+            }
+            course.sections.forEach((section) => {
+                if (section.date.start_date === null) {
+                    const startDate = dayjs(date.start_date);
+                    const endDate = dayjs(date.end_date);
+
+                    section.date.start_date = startDate
+                        .add({ week: section.id - 1 })
+                        .format();
+                    section.date.end_date = endDate
+                        .add({ week: section.id - 1 })
+                        .format();
+                }
+
+                // 종료 일자가 없는 활동의 종료 일자 설정 -- 일단 보류
+                // section.activitys.forEach((activity) => {
+                //     if (activity.date.end_date === null) {
+
+                //         // 1. 이번 주차의 끝으로 설정
+                //         activity.date.end_date = section.date.end_date;
+
+                //         // 2. 이번 학기의 끝으로 설정
+                //         activity.date.end_date = dayjs(firstSectionDate.end_date)
+                //             .add({ week: 14 })
+                //             .format();
+                //     }
+                // });
+            });
         });
     },
 
@@ -115,12 +175,19 @@ export const CourseManager = {
             }
         }
 
+        // 요청 기다리기
         await Promise.all(promises);
-        await this.Save();
+
+        // date 보정
+        this.Correction();
+
+        // 저장하기
+        await this.SaveStorage();
+
         this._refreshing = false;
     },
 
-    async RefreshCourse(id: Number, name: String) {
+    async RefreshCourse(id: number, name: String) {
         const course = await this.RefreshCourseInfo(id);
 
         if (!course) {
@@ -149,7 +216,7 @@ export const CourseManager = {
         await Promise.all(promises);
     },
 
-    async RefreshCourseInfo(id: Number) {
+    async RefreshCourseInfo(id: number) {
         const document = await GetDOMPage("/course/view.php?id=" + id);
         const $ = document.querySelector.bind(document);
         const $$ = document.querySelectorAll.bind(document);
@@ -322,7 +389,7 @@ export const CourseManager = {
         return course;
     },
 
-    async RefreshCourseAssignment(id: Number) {
+    async RefreshCourseAssignment(id: number) {
         const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
@@ -373,7 +440,7 @@ export const CourseManager = {
         }
     },
 
-    async RefreshCourseQuiz(id: Number) {
+    async RefreshCourseQuiz(id: number) {
         const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
@@ -430,7 +497,7 @@ export const CourseManager = {
         }
     },
 
-    async RefreshCourseQuizInfo(id: Number) {
+    async RefreshCourseQuizInfo(id: number) {
         const document = await GetDOMPage("/mod/quiz/view.php?id=" + id);
         const $ = document.querySelector.bind(document);
 
@@ -485,7 +552,7 @@ export const CourseManager = {
         activity.complete = activity.complete || complete;
     },
 
-    async RefreshCourseZoom(id: Number) {
+    async RefreshCourseZoom(id: number) {
         const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
@@ -534,7 +601,7 @@ export const CourseManager = {
         }
     },
 
-    async RefreshCourseVideo(id: Number) {
+    async RefreshCourseVideo(id: number) {
         const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
