@@ -1,0 +1,169 @@
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 700;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Bold.ttf)
+            format("truetype");
+}
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 400;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Regular.ttf)
+            format("truetype");
+}
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 300;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-Light.ttf)
+            format("truetype");
+}
+
+@font-face {
+    font-family: "NanumGothic";
+    font-style: normal;
+    font-weight: 800;
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot);
+    src: url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.eot?#iefix)
+            format("embedded-opentype"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.woff)
+            format("woff"),
+        url(//cdn.jsdelivr.net/font-nanum/1.0/nanumgothic/v3/NanumGothic-ExtraBold.ttf)
+            format("truetype");
+}
+
+.smartlead-plus {
+    // Clear Fix
+
+    & * {
+        margin: 0;
+        padding: 0;
+    }
+
+    & .todo-container {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex-wrap: wrap;
+
+        & > .todo-card {
+            display: flex;
+            // width: 200px;
+            overflow: hidden;
+            margin: 6px 20px;
+            padding: 10px;
+            border: 1px solid #dfdfdf;
+            border-radius: 4px;
+            box-shadow: 0px 0px 4px #00000016;
+            background-color: white;
+            color: black;
+
+            text-decoration: none;
+
+            transition: transform 0.25s, box-shadow 0.25s;
+
+            align-items: center;
+            justify-content: space-between;
+
+            &:hover {
+                transform: scale(1.03);
+                box-shadow: 0px 0px 8px #0000001f;
+            }
+
+            & > .content {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+
+                & > .icon {
+                    width: 28px;
+                    height: 28px;
+                    margin-right: 12px;
+                }
+
+                & > .text {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    flex-direction: column;
+
+                    overflow: hidden;
+
+                    & > p {
+                        width: 100%;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        word-break: break-all;
+                        word-wrap: break-word;
+
+                        &.title {
+                            font-size: 11pt;
+                        }
+
+                        &.subtitle {
+                            font-size: 8pt;
+                        }
+                    }
+                }
+            }
+
+            & > .footer {
+                display: flex;
+                align-items: center;
+
+                flex-direction: column;
+
+                &.level4 {
+                    font-weight: 600;
+                    color: #ff0000;
+                }
+                &.level3 {
+                    font-weight: 600;
+                    color: #d60878;
+                }
+                &.level2 {
+                    color: #ff9519;
+                }
+                &.level1 {
+                    color: #149634;
+                }
+                &.level0 {
+                    color: #3183e8;
+                }
+
+                & > p {
+                    width: 100%;
+                    text-align: right;
+
+                    &.timeleft {
+                        font-size: 11pt;
+                    }
+
+                    &.expire-date {
+                        font-size: 8pt;
+                    }
+                }
+            }
+        }
+    }
+}
