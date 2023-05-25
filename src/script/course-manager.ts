@@ -49,7 +49,7 @@ export const CourseManager = {
     async LoadStorage() {
         const storage = await chrome.storage.local.get(["courses", "latestRefresh"]);
         this._latestRefresh = storage.latestRefresh ?? null;
-        this.courses = storage.courses;
+        this.courses = storage.courses ?? [];
     },
 
     async LoadData() {
@@ -244,8 +244,6 @@ export const CourseManager = {
             isRegular,
             sections: []
         };
-
-        console.log(attendanceNodes);
 
         // 각 섹션 긁어오기
         sectionNodes.forEach((sectionNode) => {
