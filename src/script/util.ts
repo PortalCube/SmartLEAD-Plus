@@ -40,20 +40,20 @@ export type Period = {
 };
 
 export type Activity = {
-    id: Number;
+    id: number;
     name: string;
     type: ActivityType;
     complete: boolean;
     date: Period;
     video?: {
-        length: Number;
-        require: Number | null;
-        watched: Number | null;
+        length: number;
+        require: number | null;
+        watched: number | null;
     };
 };
 
 export type Section = {
-    id: Number;
+    id: number;
     name: string;
     date: Period;
     status: AttendanceStatus;
@@ -61,7 +61,7 @@ export type Section = {
 };
 
 export type Course = {
-    id: Number;
+    id: number;
     name: string;
     owner: string;
     isRegular: boolean;

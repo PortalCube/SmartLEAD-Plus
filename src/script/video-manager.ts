@@ -7,7 +7,7 @@ export const VideoManager = {
         return 0;
     },
 
-    set PlaybackRate(value: Number) {
+    set PlaybackRate(value: number) {
         // TODO
     },
 
@@ -15,7 +15,7 @@ export const VideoManager = {
         return 0;
     },
 
-    set Position(value: Number) {
+    set Position(value: number) {
         // TODO
     }
 };
