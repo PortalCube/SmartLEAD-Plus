@@ -98,8 +98,7 @@ export const DOMManager = {
 
             url += item.id.toString();
 
-            const activityName =
-                item.name.length > 15 ? item.name.slice(0, 15) + "..." : item.name;
+            const activityName = item.name;
             const courseName =
                 CourseManager.courses.find((course) => course.id === item.course_id)
                     ?.name ?? "";
