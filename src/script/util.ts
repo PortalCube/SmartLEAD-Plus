@@ -50,19 +50,10 @@ export type Activity = {
         require: Number | null;
         watched: Number | null;
     };
-    quiz?: {
-        attempt: {
-            total: Number;
-            left: Number;
-        };
-        inProgress: boolean;
-        timeLimit: Number;
-    };
 };
 
 export type Section = {
     id: Number;
-    week: Number | null;
     name: string;
     date: Period;
     status: AttendanceStatus;
@@ -98,14 +89,18 @@ export function GetWeekDate(text: string) {
         return null;
     } else {
         return {
-            week: parseInt(result[0]),
             start_date: dayjs({
-                month: parseInt(result[1]) - 1,
-                day: parseInt(result[2])
+                year: dayjs().get("year"),
+                month: parseInt(result[2]) - 1,
+                day: parseInt(result[3]),
+                hour: 0,
+                minute: 0,
+                second: 0
             }).format(),
             end_date: dayjs({
-                month: parseInt(result[3]) - 1,
-                day: parseInt(result[4]),
+                year: dayjs().get("year"),
+                month: parseInt(result[4]) - 1,
+                day: parseInt(result[5]),
                 hour: 23,
                 minute: 59,
                 second: 59

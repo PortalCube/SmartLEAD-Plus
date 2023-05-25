@@ -1,24 +1,49 @@
 import {
     GetDOMPage,
     GetWeekDate,
-    IsWeekText,
     Section,
     AttendanceStatus,
     Activity,
     ActivityType,
     DurationToSecond,
-    Course
+    Course,
+    Period
 } from "./util";
 import dayjs from "dayjs";
 
-const data: Course[] = [];
+const courses: Course[] = [];
 
 export const CourseManager = {
     _refreshing: false,
 
-    data,
+    courses,
 
-    async Load() {},
+    get activitys() {
+        // map & flat hell
+        const activitys = this.courses
+            .map((course) =>
+                course.sections
+                    .map((section) =>
+                        section.activitys.map((activity) => ({
+                            course_id: course.id,
+                            section_id: section.id,
+                            ...activity
+                        }))
+                    )
+                    .flat()
+            )
+            .flat();
+        return activitys;
+    },
+
+    async Save() {
+        await chrome.storage.local.set({ courses: this.courses });
+    },
+
+    async Load() {
+        const storage = await chrome.storage.local.get(["courses"]);
+        this.courses = storage.courses;
+    },
 
     async AuthCheck() {
         const document = await GetDOMPage("/local/ruauth/");
@@ -26,6 +51,36 @@ export const CourseManager = {
         // todo: add check logic
 
         return false;
+    },
+
+    Correction() {
+        // 후처리 과정 :: 누락된 date들 추가
+
+        // step 1. section의 누락된 date 추가
+
+        // 1주차 날짜 구하기
+        let firstSectionDate: Period = { start_date: null, end_date: null };
+
+        (() => {
+            for (const course of this.courses) {
+                if (!course.isRegular) {
+                    continue;
+                }
+                for (const section of course.sections) {
+                    if (section.date.start_date !== null) {
+                        // 정확한 date를 포함하는 sections
+                        const startDate = dayjs(section.date.start_date);
+                        const endDate = dayjs(section.date.end_date);
+
+                        // firstSectionDate.start_date = startDate.subtract({})
+                    }
+                }
+            }
+        })();
+
+        this.courses.forEach((course) => {
+            course.sections.forEach((section) => {});
+        });
     },
 
     async Refresh() {
@@ -45,7 +100,9 @@ export const CourseManager = {
                 .querySelector(".course_link")
                 ?.getAttribute("href")
                 ?.split("?id=")[1];
-            const name = element.querySelector(".course-title > h3")?.textContent ?? "";
+            const name =
+                element.querySelector(".course-title > h3")?.firstChild?.textContent ??
+                "";
             const type = element.classList[0];
 
             if (type === "course_label_re_01" && requireAuth) {
@@ -59,6 +116,7 @@ export const CourseManager = {
         }
 
         await Promise.all(promises);
+        await this.Save();
         this._refreshing = false;
     },
 
@@ -70,7 +128,7 @@ export const CourseManager = {
             return;
         }
 
-        const find = this.data.find((item) => item.id === id);
+        const find = this.courses.find((item) => item.id === id);
 
         if (find) {
             find.name = course.name;
@@ -78,10 +136,15 @@ export const CourseManager = {
             find.isRegular = course.isRegular;
             find.sections = course.sections;
         } else {
-            this.data.push(course);
+            this.courses.push(course);
         }
 
-        const promises = [this.RefreshCourseAssignment(id), this.RefreshCourseZoom(id)];
+        const promises = [
+            this.RefreshCourseVideo(id),
+            this.RefreshCourseAssignment(id),
+            this.RefreshCourseZoom(id),
+            this.RefreshCourseQuiz(id)
+        ];
 
         await Promise.all(promises);
     },
@@ -105,7 +168,7 @@ export const CourseManager = {
         const isRegular = $<HTMLAnchorElement>(".submenu-syllabus") !== null;
 
         const attendanceNodes = $$<HTMLLIElement>(".attendance > li");
-        const sectionNodes = $$<HTMLLIElement>(".total_sections .weeks li.section");
+        const sectionNodes = $$<HTMLLIElement>(".total_sections ul li.section");
 
         const course: Course = {
             id,
@@ -115,16 +178,23 @@ export const CourseManager = {
             sections: []
         };
 
+        console.log(attendanceNodes);
+
         // 각 섹션 긁어오기
-        sectionNodes.forEach((sectionNode, index) => {
+        sectionNodes.forEach((sectionNode) => {
+            const sectionId = sectionNode.getAttribute("id")?.split("-")[1];
             const sectionName = sectionNode.getAttribute("aria-label")?.trim() || "";
             const activityNodes = sectionNode.querySelectorAll<HTMLLIElement>(
                 ".total_sections .activity:not(.label)"
             );
 
+            if (!sectionId) {
+                console.warn("RefreshCourseInfo: 섹션 id를 찾는데 실패했습니다.");
+                return;
+            }
+
             const section: Section = {
-                id: index,
-                week: null,
+                id: parseInt(sectionId),
                 name: sectionName,
                 date: {
                     start_date: null,
@@ -138,7 +208,6 @@ export const CourseManager = {
                 const regexpResult = GetWeekDate(sectionName);
 
                 if (regexpResult) {
-                    section.week = regexpResult.week;
                     section.date.start_date = regexpResult.start_date;
                     section.date.end_date = regexpResult.end_date;
                 }
@@ -149,19 +218,19 @@ export const CourseManager = {
                     return;
                 }
 
-                const id = activityNode.getAttribute("id")?.split("-")[1];
-                const name =
+                const activityId = activityNode.getAttribute("id")?.split("-")[1];
+                const activityName =
                     activityNode
                         .querySelector<HTMLSpanElement>(".instancename")
                         ?.firstChild?.textContent?.trim() ?? "";
 
-                if (!id) {
+                if (!activityId) {
                     return;
                 }
 
                 const activity: Activity = {
-                    id: parseInt(id),
-                    name,
+                    id: parseInt(activityId),
+                    name: activityName,
                     type: ActivityType.Unknown,
                     complete: false,
                     date: {
@@ -211,19 +280,33 @@ export const CourseManager = {
         });
 
         // 출결 정보 체크
-        attendanceNodes.forEach((node, index) => {
+        attendanceNodes.forEach((node) => {
             let section: Section | undefined;
             const element = node.querySelector(".sname");
 
-            if (element) {
-                const week = element.getAttribute("data-target");
-                section = course.sections.find((item) => item.week === week);
-            } else {
-                // 강의 개요를 넣게되면 이 부분 코드 수정할 것
-                section = course.sections.find((item) => item.id === index);
+            if (!element) {
+                console.warn(
+                    `RefreshCourseInfo: ${id} 강의실의 출결 정보에 Element가 없습니다.`
+                );
+                return;
             }
 
+            const sectionId = element.getAttribute("data-target");
+
+            if (!sectionId) {
+                console.warn(
+                    `RefreshCourseInfo: ${id} 강의실의 출결 정보에서 섹션 정보를 가져오지 못했습니다.`
+                );
+
+                return;
+            }
+
+            section = course.sections.find((item) => item.id === parseInt(sectionId));
+
             if (!section) {
+                console.warn(
+                    `RefreshCourseInfo: ${id} 강의실에서 ${sectionId} 섹션이 존재하지 않습니다.`
+                );
                 return;
             }
 
@@ -240,7 +323,7 @@ export const CourseManager = {
     },
 
     async RefreshCourseAssignment(id: Number) {
-        const course = this.data.find((item) => item.id === id);
+        const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
             return;
@@ -290,65 +373,120 @@ export const CourseManager = {
         }
     },
 
-    // async RefreshCourseQuiz(id: Number) {
-    //     const course = this.data.find((item) => item.id === id);
+    async RefreshCourseQuiz(id: Number) {
+        const course = this.courses.find((item) => item.id === id);
 
-    //     if (!course) {
-    //         return;
-    //     }
+        if (!course) {
+            return;
+        }
 
-    //     const document = await GetDOMPage("/mod/quiz/index.php?id=" + id);
-    //     const $$ = document.querySelectorAll.bind(document);
+        const document = await GetDOMPage("/mod/quiz/index.php?id=" + id);
+        const $$ = document.querySelectorAll.bind(document);
 
-    //     let nodes = Array.from($$("table tbody:not(.empty) tr[class]"));
+        let nodes = Array.from($$("table tbody:not(.empty) tr[class]"));
 
-    //     for (let node of nodes) {
-    //         let cells = node.querySelectorAll("td");
+        for (let node of nodes) {
+            let cells = node.querySelectorAll("td");
 
-    //         const sectionName = cells[0].textContent?.trim();
-    //         const section = course.sections.find((item) => item.name === sectionName);
-    //         const activityId = cells[1]
-    //             ?.querySelector("a")
-    //             ?.getAttribute("href")
-    //             ?.split("?id=")[1];
-    //         const activityName = cells[1].textContent ?? "";
-    //         const activityDate = cells[2] ? dayjs(cells[2].textContent) : null;
-    //         const activityComplete = cells[3].textContent === "제출 완료";
+            const sectionName = cells[0].textContent?.trim();
+            const section = course.sections.find((item) => item.name === sectionName);
+            const activityId = cells[1]
+                ?.querySelector("a")
+                ?.getAttribute("href")
+                ?.split("?id=")[1];
+            const activityName = cells[1].textContent ?? "";
+            const activityDate = cells[2]?.textContent?.trim()
+                ? dayjs(cells[2].textContent)
+                : null;
+            const activityComplete = activityDate ? activityDate < dayjs() : false;
 
-    //         if (!activityId || !section) {
-    //             continue;
-    //         }
+            if (!activityId || !section) {
+                console.warn(node);
+                continue;
+            }
 
-    //         let activity = section.activitys.find(
-    //             (item) => item.id === parseInt(activityId)
-    //         );
+            let activity = section.activitys.find(
+                (item) => item.id === parseInt(activityId)
+            );
 
-    //         if (!activity) {
-    //             section.activitys.push({
-    //                 id: parseInt(activityId),
-    //                 name: activityName,
-    //                 type: ActivityType.Assignment,
-    //                 complete: activityComplete,
-    //                 date: {
-    //                     start_date: null,
-    //                     end_date: activityDate?.format() ?? null
-    //                 }
-    //             });
-    //         } else {
-    //             activity.complete = activityComplete;
-    //             activity.date.end_date = activityDate?.format() ?? null;
-    //         }
-    //     }
-    // },
+            if (!activity) {
+                activity = {
+                    id: parseInt(activityId),
+                    name: activityName,
+                    type: ActivityType.Quiz,
+                    complete: activityComplete,
+                    date: {
+                        start_date: null,
+                        end_date: activityDate?.format() ?? null
+                    }
+                };
+                section.activitys.push(activity);
+            } else {
+                activity.complete = activityComplete;
+                activity.date.end_date = activityDate?.format() ?? null;
+            }
 
-    // async RefreshCourseQuizInfo(id: Number) {
-    //     const document = await GetDOMPage("/mod/quiz/view.php?id=" + id);
-    //     const $ = document.querySelector.bind(document);
-    //     const $$ = document.querySelectorAll.bind(document);
-    // },
+            await this.RefreshCourseQuizInfo(parseInt(activityId));
+        }
+    },
+
+    async RefreshCourseQuizInfo(id: Number) {
+        const document = await GetDOMPage("/mod/quiz/view.php?id=" + id);
+        const $ = document.querySelector.bind(document);
+
+        const courseURL = $(".breadcrumb > li:nth-child(3) a")?.getAttribute("href");
+
+        if (!courseURL) {
+            console.warn("RefreshCourseQuizInfo: Course URL을 찾지 못했습니다.");
+            return;
+        }
+
+        const regexp = /\?id=(\d+)#section-(\d+)/g;
+        const regexpResult = regexp.exec(courseURL);
+
+        if (!regexpResult || regexpResult.length < 3) {
+            console.warn(
+                "RefreshCourseQuizInfo: Course URL에서 강의실 정보를 찾는데 실패했습니다."
+            );
+            return;
+        }
+
+        const courseId = parseInt(regexpResult[1]);
+        const sectionId = parseInt(regexpResult[2]);
+        const complete = $(".quizattemptsummary .statedetails") !== null;
+
+        const course = this.courses.find((item) => item.id === courseId);
+
+        if (!course) {
+            console.warn(
+                `RefreshCourseQuizInfo: ${courseId}를 ID로 갖는 강의를 찾지 못했습니다.`
+            );
+            return;
+        }
+
+        const section = course.sections.find((item) => item.id === sectionId);
+
+        if (!section) {
+            console.warn(
+                `RefreshCourseQuizInfo: ${courseId} 강의실에서 ${sectionId}를 ID로 갖는 섹션을 찾지 못했습니다.`
+            );
+            return;
+        }
+
+        const activity = section.activitys.find((item) => item.id === id);
+
+        if (!activity) {
+            console.warn(
+                `RefreshCourseQuizInfo: ${courseId} 강의실에서 ${id}를 ID로 갖는 활동을 찾지 못했습니다.`
+            );
+            return;
+        }
+
+        activity.complete = activity.complete || complete;
+    },
 
     async RefreshCourseZoom(id: Number) {
-        const course = this.data.find((item) => item.id === id);
+        const course = this.courses.find((item) => item.id === id);
 
         if (!course) {
             return;
@@ -393,6 +531,83 @@ export const CourseManager = {
                 activity.complete = activityDate ? dayjs() > activityDate : false;
                 activity.date.end_date = activityDate?.format() ?? null;
             }
+        }
+    },
+
+    async RefreshCourseVideo(id: Number) {
+        const course = this.courses.find((item) => item.id === id);
+
+        if (!course) {
+            console.warn(
+                `RefreshCourseVideo: 데이터에 ${id} 강의실이 존재하지 않습니다.`
+            );
+            return;
+        }
+
+        const document = await GetDOMPage(
+            "/report/ubcompletion/user_progress_a.php?id=" + id
+        );
+        const $$ = document.querySelectorAll.bind(document);
+
+        const nodes = Array.from($$(".user_progress_table tbody tr"));
+
+        let section: Section | null = null;
+
+        for (let node of nodes) {
+            const cells = Array.from(node.querySelectorAll("td"));
+
+            const sectionId =
+                cells[0].getAttribute("rowspan") && cells[0].textContent
+                    ? parseInt(cells[0].textContent)
+                    : null;
+
+            if (sectionId) {
+                section = course.sections.find((item) => item.id === sectionId) ?? null;
+                cells.shift();
+            }
+
+            if (cells[2]?.textContent?.trim() === "") {
+                // 동영상 강의가 없음
+                continue;
+            }
+
+            const activityName = cells[0].textContent?.trim();
+            const activityVideoRequire = cells[1].textContent
+                ? DurationToSecond(cells[1].textContent)
+                : null;
+            const activityVideoWatched = cells[2]?.firstChild?.textContent
+                ? DurationToSecond(cells[2].firstChild.textContent)
+                : null;
+            const activityComplete = cells[3]?.textContent?.trim() === "O";
+
+            if (!section) {
+                console.warn(
+                    `RefreshCourseVideo: 섹션을 찾을 수 없습니다. sectionId를 제대로 찾지 못했을 가능성이 있습니다.`
+                );
+                continue;
+            }
+
+            // 출석부 페이지는 명확한 id가 없기에 이름으로 검색
+            let activity = section.activitys.find((item) => item.name === activityName);
+
+            if (!activity) {
+                console.warn(
+                    `RefreshCourseVideo: ${id} 강의실에서 "${activityName}"을 이름으로 갖는 활동을 찾지 못했습니다.`
+                );
+                continue;
+            }
+
+            if (!activity.video) {
+                activity.video = {
+                    length: 0,
+                    require: null,
+                    watched: null
+                };
+            }
+
+            activity.complete = activityComplete;
+            activity.video.require = activityVideoRequire;
+            activity.video.watched = activityVideoWatched;
         }
     }
 };
