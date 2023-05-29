@@ -28,9 +28,24 @@ export const DOMManager = {
 
         element.innerHTML = LandingPage;
 
-        // Summery Page Build
+        // this.UpdateImage();
+        this.BuildBackground();
 
+        // Summery Page Build
         this.BuildTodoElement();
+    },
+
+    BuildBackground() {
+        const element = $<HTMLDivElement>("#page-container");
+        const backgroundElement = document.createElement("div");
+
+        backgroundElement.classList.add("smartlead-plus", "landing-background");
+
+        if (!element) {
+            return;
+        }
+
+        element.prepend(backgroundElement);
     },
 
     BuildTodoElement() {
