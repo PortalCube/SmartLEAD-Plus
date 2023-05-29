@@ -95,19 +95,23 @@ export const DOMManager = {
             switch (item.type) {
                 case ActivityType.Video:
                     url = "/mod/vod/viewer.php?id=";
-                    icon = "/theme/image.php/coursemosv2/vod/1599440449/icon";
+                    icon =
+                        "/theme/image.php/coursemosv2/local_ubion/1681179291/course_format/mod_icon/vod";
                     break;
                 case ActivityType.Assignment:
                     url = "/mod/assign/view.php?id=";
-                    icon = "/theme/image.php/coursemosv2/assign/1599440449/icon";
+                    icon =
+                        "/theme/image.php/coursemosv2/local_ubion/1681179291/course_format/mod_icon/assign";
                     break;
                 case ActivityType.Quiz:
                     url = "/mod/quiz/view.php?id=";
-                    icon = "/theme/image.php/coursemosv2/quiz/1599440449/icon";
+                    icon =
+                        "/theme/image.php/coursemosv2/local_ubion/1681179291/course_format/mod_icon/quiz";
                     break;
                 case ActivityType.Zoom:
                     url = "/mod/zoom/view.php?id=";
-                    icon = "/theme/image.php/coursemosv2/zoom/1599440449/icon";
+                    icon =
+                        "/theme/image.php/coursemosv2/local_ubion/1681179291/course_format/mod_icon/zoom";
                     break;
             }
 
