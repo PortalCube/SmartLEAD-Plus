@@ -62,6 +62,13 @@
     size-adjust: 110%;
 }
 
+body.r1024 .smartlead-plus {
+    &.landing-background {
+        width: calc(100% - 60px);
+        min-width: 920px;
+    }
+}
+
 .smartlead-plus {
     // Clear Fix
     & * {
@@ -71,7 +78,7 @@
 
     &.landing-background {
         position: absolute;
-        width: 100%;
+        width: calc(100% - 190px);
         height: calc(100% - 88px);
         margin-top: -68px;
 
