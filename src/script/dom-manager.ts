@@ -163,7 +163,7 @@ export const DOMManager = {
                 level = 1; // 10일
             }
 
-            let itemElement = LandingTodoItem.replace("{URL}", "url")
+            let itemElement = LandingTodoItem.replace("{URL}", url)
                 .replace("{ICON}", icon)
                 .replace("{TITLE}", activityName)
                 .replace("{SUBTITLE}", courseName)
