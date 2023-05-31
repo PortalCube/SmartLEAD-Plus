@@ -1,7 +1,8 @@
 "use strict";
 
 import LandingPage from "../html/landing/main.html?raw";
-import LandingCourse from "../html/landing/course.html?raw";
+import LandingCourseContainer from "../html/landing/course.html?raw";
+import LandingCourseItem from "../html/landing/course-item.html?raw";
 import LandingTodoContainer from "../html/landing/todo.html?raw";
 import LandingTodoItem from "../html/landing/todo-item.html?raw";
 import LandingWeekly from "../html/landing/weekly.html?raw";
@@ -16,6 +17,8 @@ const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 export const DOMManager = {
+    landingMode: 1,
+
     BuildLandingPage() {
         const element = $<HTMLDivElement>(".progress_courses");
 
@@ -27,6 +30,26 @@ export const DOMManager = {
         element.classList.add("smartlead-plus");
 
         element.innerHTML = LandingPage;
+
+        const summeryList = element.querySelector<HTMLDivElement>(".summery-list");
+        const courseList = element.querySelector<HTMLDivElement>(".course-list");
+        const todoList = element.querySelector<HTMLDivElement>(".todo-list");
+
+        if (courseList) {
+            courseList.onclick = () => {
+                if (this.landingMode !== 2) {
+                    this.BuildCourseElement();
+                }
+            };
+        }
+
+        if (todoList) {
+            todoList.onclick = () => {
+                if (this.landingMode !== 1) {
+                    this.BuildTodoElement();
+                }
+            };
+        }
 
         // this.UpdateImage();
         this.BuildBackground();
@@ -49,6 +72,7 @@ export const DOMManager = {
     },
 
     BuildTodoElement() {
+        this.landingMode = 1;
         const container = $<HTMLDivElement>(".smartlead-plus .landing-container");
 
         if (!container) {
@@ -58,6 +82,7 @@ export const DOMManager = {
 
         const todoContainer = StringToNode(LandingTodoContainer)[0] as HTMLDivElement;
 
+        container.innerHTML = "";
         container.appendChild(todoContainer);
 
         const list = CourseManager.activitys.filter(
@@ -138,7 +163,7 @@ export const DOMManager = {
                 level = 1; // 10일
             }
 
-            let itemElement = LandingTodoItem.replace("{URL}", url)
+            let itemElement = LandingTodoItem.replace("{URL}", "url")
                 .replace("{ICON}", icon)
                 .replace("{TITLE}", activityName)
                 .replace("{SUBTITLE}", courseName)
@@ -147,6 +172,37 @@ export const DOMManager = {
                 .replace("{EXPIRE}", expireDate);
 
             todoContainer.innerHTML += itemElement;
+        }
+    },
+
+    BuildCourseElement() {
+        this.landingMode = 2;
+        const container = $<HTMLDivElement>(".smartlead-plus .landing-container");
+
+        if (!container) {
+            console.error("BuildCourseElement: 컨테이너 Element를 찾을 수 없습니다.");
+            return;
+        }
+
+        const courseContainer = StringToNode(LandingCourseContainer)[0] as HTMLDivElement;
+
+        container.innerHTML = "";
+        container.appendChild(courseContainer);
+
+        for (const course of CourseManager.courses) {
+            const color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(
+                Math.random() * 256
+            )}, ${Math.floor(Math.random() * 256)})`;
+
+            let itemElement = LandingCourseItem.replace(
+                "{URL}",
+                "https://smartlead.hallym.ac.kr/course/view.php?id=" + course.id
+            )
+                .replace("{COLOR}", color)
+                .replace("{TITLE}", course.name)
+                .replace("{SUBTITLE}", course.owner);
+
+            courseContainer.innerHTML += itemElement;
         }
     }
 };
