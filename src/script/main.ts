@@ -16,6 +16,7 @@ export const ExtensionManager = {
         await CourseManager.LoadData();
 
         console.log(CourseManager.courses);
+        console.log(CourseManager._latestRefresh);
 
         // 경로에 따라서 페이지 구성하기
         switch (location.pathname) {
@@ -27,6 +28,12 @@ export const ExtensionManager = {
                 // 강좌 메인 페이지
                 await this.InitCoursePage();
                 break;
+            case "/mod/vod/viewer.php":
+                const element = document.querySelector<HTMLDivElement>(".jw-preview");
+                const element2 = document.querySelector<HTMLDivElement>(".attendance");
+                if (element && element2) {
+                    element2.textContent = element.style.backgroundImage.split("/")[3];
+                }
         }
     },
 
