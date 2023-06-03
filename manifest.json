@@ -18,7 +18,8 @@
     "content_scripts": [
         {
             "js": ["src/script/main.ts"],
-            "matches": ["https://smartlead.hallym.ac.kr/*"]
+            "matches": ["https://smartlead.hallym.ac.kr/*"],
+            "run_at": "document_end"
         }
     ]
 }
