@@ -12,12 +12,7 @@ import { DOMManager } from "./dom-manager";
 
 export const ExtensionManager = {
     async Init() {
-        // 데이터 불러오기
-        await CourseManager.LoadData();
-
-        console.log(CourseManager.courses);
-        console.log(CourseManager._latestRefresh);
-
+        console.log(1);
         // 경로에 따라서 페이지 구성하기
         switch (location.pathname) {
             case "/":
@@ -38,6 +33,8 @@ export const ExtensionManager = {
     },
 
     async InitLandingPage() {
+        DOMManager.BuildBackground();
+        await CourseManager.LoadData();
         DOMManager.BuildLandingPage();
     },
 
