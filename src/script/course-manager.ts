@@ -56,7 +56,7 @@ export const CourseManager = {
         const now = dayjs();
         await this.LoadStorage();
 
-        if (!this._latestRefresh || now.diff(this._latestRefresh, "minute") > 5) {
+        if (!this._latestRefresh || now.diff(this._latestRefresh, "minute") > 30) {
             await this.Refresh();
         }
     },
