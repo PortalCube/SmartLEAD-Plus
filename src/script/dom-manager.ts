@@ -1,20 +1,22 @@
 "use strict";
 
 import LandingPage from "../html/landing/main.html?raw";
+import LandingBackground from "../html/landing/background.html?raw";
 import LandingCourseContainer from "../html/landing/course.html?raw";
 import LandingCourseItem from "../html/landing/course-item.html?raw";
 import LandingTodoContainer from "../html/landing/todo.html?raw";
 import LandingTodoItem from "../html/landing/todo-item.html?raw";
-import LandingWeekly from "../html/landing/weekly.html?raw";
-import CourseProgress from "../html/course/progress.html?raw";
+// import LandingWeekly from "../html/landing/weekly.html?raw";
+// import CourseProgress from "../html/course/progress.html?raw";
 
 import dayjs from "dayjs";
+import { decode } from "blurhash";
 
 import { CourseManager } from "./course-manager";
 import { ActivityType, StringToNode } from "./util";
 
 const $ = document.querySelector.bind(document);
-const $$ = document.querySelectorAll.bind(document);
+// const $$ = document.querySelectorAll.bind(document);
 
 export const DOMManager = {
     landingMode: 1,
@@ -35,40 +37,95 @@ export const DOMManager = {
         const courseList = element.querySelector<HTMLDivElement>(".course-list");
         const todoList = element.querySelector<HTMLDivElement>(".todo-list");
 
-        if (courseList) {
-            courseList.onclick = () => {
-                if (this.landingMode !== 2) {
-                    this.BuildCourseElement();
-                }
-            };
+        if (!summeryList || !courseList || !todoList) {
+            return;
         }
 
-        if (todoList) {
-            todoList.onclick = () => {
-                if (this.landingMode !== 1) {
-                    this.BuildTodoElement();
-                }
-            };
-        }
+        courseList.onclick = () => {
+            if (this.landingMode !== 2) {
+                summeryList.classList.remove("selected");
+                todoList.classList.remove("selected");
+                courseList.classList.add("selected");
+                this.BuildCourseElement();
+            }
+        };
 
-        // this.UpdateImage();
-        this.BuildBackground();
+        todoList.onclick = () => {
+            if (this.landingMode !== 1) {
+                summeryList.classList.remove("selected");
+                courseList.classList.remove("selected");
+                todoList.classList.add("selected");
+                this.BuildTodoElement();
+            }
+        };
 
         // Summery Page Build
         this.BuildTodoElement();
+        todoList.classList.add("selected");
     },
 
-    BuildBackground() {
+    async BuildBackground() {
         const element = $<HTMLDivElement>("#page-container");
-        const backgroundElement = document.createElement("div");
-
-        backgroundElement.classList.add("smartlead-plus", "landing-background");
+        const backgroundElement = StringToNode(LandingBackground)[0] as HTMLDivElement;
 
         if (!element) {
             return;
         }
 
         element.prepend(backgroundElement);
+
+        const res = await fetch(
+            "https://api.kiriko.dev/smartlead-plus/v1/wallpaper/korea/10m"
+        );
+        const data = (await res.json())[0];
+
+        const blurhash = data.blur_hash as string;
+        const location = data.location.name as string;
+        const user = data.user.name as string;
+        let src = data.urls.full as string;
+        src =
+            src.replace("&fm=jpg", "&fm=webp") +
+            "&dpr=1.5&w=" +
+            window.screen.width.toString();
+
+        const canvas = backgroundElement.querySelector("canvas");
+
+        if (canvas) {
+            const width = (canvas.width = 16);
+            const height = (canvas.height = 10);
+            const ctx = canvas.getContext("2d");
+
+            if (ctx) {
+                const imageArray = ctx.createImageData(width, height);
+                const blurhashArray = decode(blurhash, width, height);
+                imageArray.data.set(blurhashArray);
+                ctx.putImageData(imageArray, 0, 0);
+            }
+
+            setTimeout(() => canvas.classList.add("complete"), 500);
+        }
+
+        const credit = backgroundElement.querySelector("p");
+
+        if (!credit) {
+            return;
+        }
+
+        if (location) {
+            credit.textContent = `위치: ${location}\n`;
+        }
+
+        credit.textContent += `${user}님의 사진`;
+
+        const img = backgroundElement.querySelector("img");
+
+        if (!img) {
+            return;
+        }
+
+        img.onload = () => img.classList.add("complete");
+
+        img.src = src;
     },
 
     BuildTodoElement() {
