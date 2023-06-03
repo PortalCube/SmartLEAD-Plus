@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/chrome": "^0.0.236",
     "@types/lodash": "^4.14.194",
+    "blurhash": "^2.0.5",
     "dayjs": "^1.11.7",
     "lodash": "^4.17.21"
   }
