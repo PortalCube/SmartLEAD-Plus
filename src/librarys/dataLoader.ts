@@ -17,12 +17,12 @@ export async function loadData() {
             dayjs(storageData.info.modifiedAt) > dayjs().subtract(10, "minute")
         ) {
             // 마지막 업데이트 10분 이내
-            // return {
-            //     courses: storageData.courses as MoodleCourse[],
-            //     sections: storageData.sections as MoodleSection[],
-            //     activitys: storageData.activitys as MoodleActivity[],
-            //     modifiedDate: dayjs(storageData.info.modifiedAt),
-            // };
+            return {
+                courses: storageData.courses as MoodleCourse[],
+                sections: storageData.sections as MoodleSection[],
+                activitys: storageData.activitys as MoodleActivity[],
+                modifiedDate: dayjs(storageData.info.modifiedAt),
+            };
         }
     }
 
