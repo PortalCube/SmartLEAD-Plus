@@ -289,6 +289,7 @@ export async function scrapVideoProgress(
 
     let errorElement = document.querySelector(".alert-danger");
 
+    // 온라인 출석부를 사용하지 않음
     if (errorElement) {
         document = await fetchDocument(
             "/report/ubcompletion/user_progress.php?id=" + courseId
@@ -316,10 +317,17 @@ export async function scrapVideoProgress(
 }
 
 function getTime(timeText: string) {
-    if (timeText === "-") return 0;
-
     const arr = timeText.split(":").map((item) => Number(item));
-    return arr[0] * 60 + arr[1];
+
+    if (arr.length <= 1) {
+        return 0;
+    } else if (arr.length === 2) {
+        return arr[0] * 60 + arr[1];
+    } else if (arr.length === 3) {
+        return arr[0] * 60 * 60 + arr[1] * 60 + arr[2];
+    } else {
+        return 0;
+    }
 }
 
 function getActivity(node: HTMLTableRowElement, activitys: MoodleActivity[]) {
@@ -355,8 +363,8 @@ function getActivityAlternative(
     const cellElements = node.querySelectorAll("td");
     const cellCount = cellElements.length;
 
-    const playTimeElement = cellElements[cellCount === 4 ? 3 : 2];
-    const requirementElement = cellElements[cellCount === 4 ? 2 : 1];
+    const playTimeElement = cellElements[cellCount === 5 ? 3 : 2];
+    const requirementElement = cellElements[cellCount === 5 ? 2 : 1];
     const buttonElement = playTimeElement.querySelector("button");
 
     const requirement = getTime(requirementElement.textContent?.trim() ?? "0");
