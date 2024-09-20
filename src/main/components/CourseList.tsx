@@ -5,21 +5,26 @@ import { MoodleCourse } from "../../librarys/course.ts";
 import { loadData } from "../../librarys/dataLoader.ts";
 import { coursesAtom, modifiedDateAtom } from "../atom.ts";
 import { useAtom } from "jotai";
+import Panel from "./Panel.tsx";
 
-const Container = styled.div`
-    max-width: 640px;
-    min-height: 480px;
-    padding: 12px 16px;
-    border-radius: 8px;
+const Container = styled(Panel)`
+    max-width: 600px;
+    height: 800px;
+    padding: 16px;
+
+    box-sizing: border-box;
+
     display: flex;
-    align-items: center;
     flex-direction: column;
-    flex-wrap: wrap;
-    box-sizing: content-box;
-    box-shadow: 0px 0px 8px #0000006f;
-    background-color: #131313af;
+    align-items: center;
 
-    backdrop-filter: blur(16px);
+    overflow: hidden auto;
+
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
 `;
 
 function getColor(value: number) {

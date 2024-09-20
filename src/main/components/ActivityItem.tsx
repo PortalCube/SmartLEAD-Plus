@@ -6,51 +6,95 @@ import {
 } from "../../librarys/activity.ts";
 import dayjs from "dayjs";
 import { MoodleCourse } from "../../librarys/course.ts";
+import classNames from "classnames";
+import { useState } from "react";
 // import PropTypes from "prop-types";
 
 const Item = styled.a`
-    display: flex;
     width: 100%;
-    overflow: hidden;
-    margin: 6px 0;
-    padding: 8px 10px;
+    padding: 8px 12px;
+    display: flex;
     border-radius: 4px;
     color: #efefef;
-    box-sizing: content-box;
+    box-sizing: border-box;
 
-    gap: 4px;
+    gap: 12px;
 
     text-decoration: none;
 
-    transition: background-color 0.2s;
+    transition:
+        transform 0.2s,
+        background-color 0.2s;
 
     align-items: center;
     justify-content: space-between;
 
     &:hover {
-        background-color: #0000006f;
+        background-color: rgba(255, 255, 255, 0.1);
         text-decoration: none;
         color: #efefef;
-    }
 
-    &:focus {
-        text-decoration: none;
-        color: #efefef;
-    }
-
-    @media (max-width: 1299px) {
-        margin: 4px 0;
-        padding: 6px 8px;
+        transform: scale(1.005);
     }
 `;
 
-const ExpireContent = styled.div`
+const Icon = styled.img`
+    width: 32px;
+    height: 32px;
+`;
+
+const Info = styled.div`
+    max-width: 364px;
+    flex-grow: 1;
+
     display: flex;
-    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+
+    & > p {
+        white-space: pre;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+    }
+`;
+
+const CourseName = styled.p`
+    color: #999999;
+    font-size: 12px;
+    font-weight: 400;
+`;
+
+const ActivityName = styled.p`
+    color: #dfdfdf;
+
+    font-size: 16px;
+    font-weight: 600;
+`;
+
+const DeadlineBadge = styled.p`
+    width: 120px;
+    flex-shrink: 0;
+    padding: 4px 0;
+    border-radius: 2px;
+    display: flex;
+    justify-content: right;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    &.emergency {
+        background-color: #ff3434;
+        box-shadow: 0px 0px 4px #ff001a;
+
+        justify-content: center;
+    }
+
+    &.hover {
+        font-size: 12px;
+    }
 
     &.level3 {
-        padding: 4px 8px;
-        background-color: #ff3434;
         color: white;
     }
 
@@ -67,59 +111,6 @@ const ExpireContent = styled.div`
     }
 `;
 
-const Icon = styled.img`
-    width: 28px;
-    height: 28px;
-    margin-right: 12px;
-`;
-
-const TextContainer = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    text-align: left;
-    flex-grow: 1;
-    flex-direction: column;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-break: break-all;
-    word-wrap: break-word;
-`;
-
-const Title = styled.p`
-    margin: 0;
-    max-width: 400px;
-    font-size: 11pt;
-
-    @media (max-width: 1299px) {
-        max-width: 220px;
-        font-size: 10pt;
-    }
-`;
-
-const Subtitle = styled.p`
-    margin: 0;
-    max-width: 400px;
-    font-size: 8pt;
-
-    @media (max-width: 1299px) {
-        max-width: 220px;
-        font-size: 7pt;
-    }
-`;
-
-const ExpireText = styled.p`
-    margin: 0;
-    width: 100%;
-    text-align: right;
-    font-size: 12pt;
-
-    @media (max-width: 1299px) {
-        font-size: 11pt;
-    }
-`;
-
 const ActivityItem = ({
     activity,
     course,
@@ -127,16 +118,26 @@ const ActivityItem = ({
     activity: MoodleActivity;
     course: MoodleCourse | undefined;
 }) => {
+    const [isHover, setHover] = useState(false);
+
     const endDate = dayjs(activity.endDate! * 1000);
     const timeLeft = dayjs().diff(endDate, "hour") * -1;
 
     let endDateText = `${endDate.fromNow(true)} 남음`;
     let level = 0;
+    let isEmergency = timeLeft < 1; // 1시간 이내로 종료
 
     if (timeLeft < 0) {
         // 이미 활동이 종료됨
         level = 3;
-        endDateText = `${endDate.fromNow(true)} 전에 마감`;
+        isEmergency = true;
+        endDateText = `!!! ${endDate.fromNow(true)} 지남 !!!`;
+    } else if (timeLeft < 1) {
+        // 1시간 남음!
+
+        level = 3;
+        isEmergency = true;
+        endDateText = `${endDate.fromNow(true)} 남음`;
     } else if (timeLeft < 24) {
         // 24시간 이내로 활동 종료
         endDateText = `${timeLeft}시간 남음`;
@@ -150,25 +151,38 @@ const ActivityItem = ({
         level = 1;
     }
 
+    if (isHover) {
+        endDateText = endDate.format("M월 D일 HH:mm:ss");
+    }
+
+    const badgeClass = classNames("level" + level, {
+        emergency: isEmergency,
+        hover: isHover,
+    });
+
+    const onMouseEnter = () => {
+        setHover(true);
+    };
+
+    const onMouseLeave = () => {
+        setHover(false);
+    };
+
     return (
-        <Item href={getActivityUrl(activity)} target="_blank">
+        <Item
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            href={getActivityUrl(activity)}
+            target="_blank"
+        >
             <Icon src={getActivityIcon(activity)} alt="" />
-            <TextContainer>
-                <Title>{activity.name}</Title>
-                <Subtitle>{course?.name}</Subtitle>
-            </TextContainer>
-            <ExpireContent className={`level${level}`}>
-                <ExpireText>{endDateText}</ExpireText>
-            </ExpireContent>
+            <Info>
+                <CourseName>{course?.name}</CourseName>
+                <ActivityName>{activity.name}</ActivityName>
+            </Info>
+            <DeadlineBadge className={badgeClass}>{endDateText}</DeadlineBadge>
         </Item>
     );
 };
-
-// ActivityItem.propTypes = {
-//     url: PropTypes.string.isRequired,
-//     title: PropTypes.string.isRequired,
-//     subtitle: PropTypes.string.isRequired,
-//     color: PropTypes.string.isRequired,
-// };
 
 export default ActivityItem;

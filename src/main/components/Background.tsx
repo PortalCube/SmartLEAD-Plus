@@ -12,7 +12,6 @@ import { decode } from "blurhash";
 const Container = styled.div`
     width: 100%;
     height: 100%;
-    $filter: contrast(0.7) brightness(1);
 `;
 
 const Preview = styled.canvas`
@@ -21,7 +20,7 @@ const Preview = styled.canvas`
     height: 100%;
     transition: opacity 0.5s;
     opacity: 0;
-    filter: $filter;
+    filter: contrast(0.7) brightness(1);
 
     &.complete {
         opacity: 1;
@@ -35,7 +34,7 @@ const Image = styled.img`
     object-fit: cover;
     transition: opacity 0.5s;
     opacity: 0;
-    filter: $filter;
+    filter: contrast(0.7) brightness(1);
 
     &.complete {
         opacity: 1;
@@ -54,8 +53,8 @@ const Vignette = styled.div`
 
     background: linear-gradient(
         270deg,
-        rgba(0, 0, 0, 0.2) 0%,
-        rgba(0, 0, 0, 0.75) 66%
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.5) 66%
     );
 `;
 
