@@ -19,6 +19,7 @@ import {
 } from "./activity.ts";
 import dayjs from "dayjs";
 import { unescape } from "lodash";
+import { refineCourseOwnerText } from "./refineCourseOwnerText.ts";
 
 export async function scrapData(token: string, userId: number) {
     console.time("scrapData");
@@ -164,7 +165,8 @@ async function scrapCourseListDetail(courses: MoodleCourse[]) {
             courseElement
                 .querySelector(".course-image > img")
                 ?.getAttribute("src") ?? "";
-        const owner = courseElement.querySelector(".prof")?.textContent ?? "";
+        const ownerText =
+            courseElement.querySelector(".prof")?.textContent ?? "";
 
         const find = courses.find((course) => course.id === Number(id));
 
@@ -172,7 +174,7 @@ async function scrapCourseListDetail(courses: MoodleCourse[]) {
             continue;
         }
 
-        find.ownerName = owner;
+        find.ownerName = refineCourseOwnerText(ownerText);
         find.imageUrl = image;
     }
 }

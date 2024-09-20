@@ -1,11 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-// import { crawlCourse } from "../../scraper/course.ts";
-// import { crawlAssignment } from "../../scraper/assignment.ts";
-// import { crawlQuiz } from "../../scraper/quiz.ts";
-// import { Activity, ActivityType, Section } from "../../librarys/type";
-// import { crawlVideo } from "../../scraper/vod.ts";
-
 import styled from "styled-components";
 import { decode } from "blurhash";
 
@@ -45,11 +39,6 @@ const Vignette = styled.div`
     position: absolute;
     width: 100%;
     height: 100%;
-    /* background: radial-gradient(
-        circle at calc(400px + 50%) 50%,
-        rgba(0, 0, 0, 0) 20%,
-        rgba(0, 0, 0, 0.6) 80%
-    ); */
 
     background: linear-gradient(
         270deg,
