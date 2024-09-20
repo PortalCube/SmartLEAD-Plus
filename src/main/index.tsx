@@ -8,7 +8,7 @@ import "dayjs/locale/ko";
 
 import "./style.scss";
 import App from "./App.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import LoginSection from "./sections/LoginSection.tsx";
 import MainSection from "./sections/MainSection.tsx";
 
@@ -18,27 +18,22 @@ dayjs.extend(arraySupport);
 dayjs.extend(objectSupport);
 dayjs.locale("ko");
 
-const router = createBrowserRouter(
-    [
-        {
-            path: "/",
-            element: <App />,
-            children: [
-                {
-                    path: "/login",
-                    element: <LoginSection />,
-                },
-                {
-                    path: "/dashboard",
-                    element: <MainSection />,
-                },
-            ],
-        },
-    ],
+const router = createMemoryRouter([
     {
-        basename: "/src/main/index.html",
-    }
-);
+        path: "/",
+        element: <App />,
+        children: [
+            {
+                path: "/login",
+                element: <LoginSection />,
+            },
+            {
+                path: "/dashboard",
+                element: <MainSection />,
+            },
+        ],
+    },
+]);
 
 const root = document.getElementById("root");
 if (root) {
