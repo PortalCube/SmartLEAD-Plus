@@ -127,6 +127,7 @@ const Login = ({}) => {
     const navigate = useNavigate();
     const [id, setId] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [storeSession, setStoreSession] = useState<boolean>(false);
 
     const externalUrl = LOGIN_URL;
 
@@ -140,6 +141,10 @@ const Login = ({}) => {
         if (event.target) {
             setPassword(event.target.value);
         }
+    };
+
+    const onCheckboxClick = () => {
+        setStoreSession((state) => !state);
     };
 
     const onLoginButtonClick = async () => {
@@ -201,12 +206,10 @@ const Login = ({}) => {
                     value={password}
                 />
             </FieldGrid>
-            {/* <CheckGroup>
-                <CheckBox>
-                    <MdCheck />
-                </CheckBox>
+            <CheckGroup onClick={onCheckboxClick}>
+                <CheckBox>{storeSession ? <MdCheck /> : null}</CheckBox>
                 24시간 동안 로그인 유지하기
-            </CheckGroup> */}
+            </CheckGroup>
             <Divider />
             <LoginButton onClick={onLoginButtonClick}>로그인</LoginButton>
             <ExternalButton href={externalUrl}>
