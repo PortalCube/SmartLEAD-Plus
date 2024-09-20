@@ -39,7 +39,7 @@
     "web_accessible_resources": [
         {
             "matches": ["<all_urls>"],
-            "resources": ["src/main/index.html"]
+            "resources": ["index.html"]
         }
     ]
 }
