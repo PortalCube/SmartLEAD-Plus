@@ -13,7 +13,9 @@ import { VodCompleteMessage, VodMessageType } from "./vod-message.ts";
     // @ts-ignore
     window.remote_vod_pause = () => {};
 
-    const player = jwplayer("vod_player");
+    //@ts-ignore
+    // console.log(window);
+    // const player = window.jwplayer("vod_player") as jwplayer.JWPlayer;
 
     // player.on("play", () => {
     //     isPlaying = true;
@@ -29,24 +31,24 @@ import { VodCompleteMessage, VodMessageType } from "./vod-message.ts";
     //     isPlaying = false;
     // });
 
-    player.on("complete", () => {
-        console.log("재생 종료");
-        const message: VodCompleteMessage = {
-            type: VodMessageType.VideoComplete,
-            data: {
-                id: activityId,
-                position: player.getPosition(),
-                duration: player.getDuration(),
-            },
-            _slplusVodMessage: true,
-        };
+    // player.on("complete", () => {
+    //     console.log("재생 종료");
+    //     const message: VodCompleteMessage = {
+    //         type: VodMessageType.VideoComplete,
+    //         data: {
+    //             id: activityId,
+    //             position: player.getPosition(),
+    //             duration: player.getDuration(),
+    //         },
+    //         _slplusVodMessage: true,
+    //     };
 
-        window.postMessage(message);
-    });
+    //     window.postMessage(message);
+    // });
 
-    setInterval(() => {
-        console.log(player.getPosition(), player.getState());
-    }, 100);
+    // setInterval(() => {
+    //     console.log(player.getPosition(), player.getState());
+    // }, 100);
 
     // document.addEventListener("visibilitychange", () => {
     //     visibilityChange = true;

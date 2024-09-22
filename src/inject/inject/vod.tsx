@@ -51,18 +51,20 @@ export default function vodInject() {
     script.type = "module";
     document.head.prepend(script);
 
-    const element = document.querySelector<HTMLDivElement>(".jw-preview");
+    const element =
+        document.querySelector<HTMLSourceElement>("#my-video > source");
+
+    console.log(element);
 
     if (!element) {
-        // 썸네일로 UUID를 구할 수 없음 -- Injection 불가
+        // UUID를 구할 수 없음 -- Injection 불가
         return;
     }
 
-    //@ts-ignore
-    console.log("jwplayer", window.jwplayer);
-
-    const uuid = element.style.backgroundImage.split("/")[3];
-    const title = document.querySelector("title")?.textContent ?? uuid;
+    const uuid = element.src.split("/")[4];
+    const titleElement =
+        document.querySelector<HTMLHeadingElement>("#vod_header > h1");
+    const title = titleElement?.firstChild?.textContent?.trim() ?? uuid;
 
     const reactRoot = document.createElement("div");
     reactRoot.id = "slplus-vod-download";
@@ -70,7 +72,7 @@ export default function vodInject() {
     reactRoot.style.height = "100%";
 
     const parent = document.querySelector("#vod_header");
-    parent?.insertBefore(reactRoot, parent?.childNodes[4]);
+    parent?.insertBefore(reactRoot, parent?.childNodes[2]);
 
     RenderRoot(
         "#slplus-vod-download",
