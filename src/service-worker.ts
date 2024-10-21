@@ -1,5 +1,8 @@
 import NotificationImage from "./assets/images/notification.png";
-import { disableAiTutor, enableAiTutor } from "./librarys/blockAiTutor.ts";
+import {
+    deactiveBlockRules,
+    activeBlockRules,
+} from "./librarys/blockNetRequest.ts";
 import { BASE_URL, LOGOUT_URL } from "./librarys/constant.ts";
 import { removeMoodleData, removeUserToken } from "./librarys/dataStorage.ts";
 import { removeSessionCookie } from "./librarys/account.ts";
@@ -35,9 +38,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         );
     } else if (request.type === "ai_tutor") {
         if (request.payload.active === true) {
-            enableAiTutor();
+            deactiveBlockRules();
         } else {
-            disableAiTutor();
+            activeBlockRules();
         }
     }
 });

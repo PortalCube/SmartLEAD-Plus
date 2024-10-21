@@ -1,22 +1,27 @@
-// AI 튜터 스크립트
-const blockRules: chrome.declarativeNetRequest.Rule[] = [
-    {
-        id: 1,
+const targetDomains = ["smartlead.hallym.ac.kr"];
+const blockUrls = [
+    "csms-ai.s3.ap-northeast-2.amazonaws.com/js/react.js",
+    "s3.ap-northeast-2.amazonaws.com/code.coursemos.co.kr/lc/learningChecker-v2-amd.js",
+];
+
+const blockRules: chrome.declarativeNetRequest.Rule[] = blockUrls.map(
+    (item, index) => ({
+        id: index + 1,
         priority: 1,
         action: { type: chrome.declarativeNetRequest.RuleActionType.BLOCK },
         condition: {
-            initiatorDomains: ["smartlead.hallym.ac.kr"],
-            urlFilter: "||csms-ai.s3.ap-northeast-2.amazonaws.com/js/react.js",
+            initiatorDomains: targetDomains,
+            urlFilter: "||" + item,
             resourceTypes: [
                 chrome.declarativeNetRequest.ResourceType.SCRIPT,
                 chrome.declarativeNetRequest.ResourceType.MAIN_FRAME,
             ],
         },
-    },
-];
+    })
+);
 
-// AI 튜터 스크립트를 활성화
-export async function enableAiTutor() {
+// 스크립트 차단 해제
+export async function deactiveBlockRules() {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
     const oldRuleIds = oldRules.map((rule) => rule.id);
 
@@ -25,8 +30,8 @@ export async function enableAiTutor() {
     });
 }
 
-// AI 튜터 스크립트를 비활성화
-export async function disableAiTutor() {
+// 스크립트 차단
+export async function activeBlockRules() {
     const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
     const oldRuleIds = oldRules.map((rule) => rule.id);
 
