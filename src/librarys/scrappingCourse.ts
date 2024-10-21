@@ -21,9 +21,14 @@ import dayjs from "dayjs";
 import { unescape } from "lodash";
 import { refineCourseOwnerText } from "./refineCourseOwnerText.ts";
 
+/**
+ * 코스모스 Web과 API를 통해서 데이터를 스크랩합니다.
+ * @param token API Token
+ * @param userId 사용자 id
+ * @returns 코스, 섹션, 활동
+ */
 export async function scrapData(token: string, userId: number) {
-    console.time("scrapData");
-    console.count("scrapData API Call");
+    // API에서 코스 목록을 스크랩
     const courseResponse = await getCourseList(token);
     if (isMoodleError(courseResponse)) {
         return;
@@ -36,12 +41,12 @@ export async function scrapData(token: string, userId: number) {
     const sections: MoodleSection[] = [];
     const activitys: MoodleActivity[] = [];
 
-    // 코스가 없음
+    // 코스 목록에 아무것도 없음
     if (courses.length === 0) {
         return;
     }
 
-    console.count("scrapData API Call");
+    // Web에서 코스 목록을 다시 스크랩하여 부족한 정보 채우기
     await scrapCourseListDetail(courses);
 
     try {
@@ -74,7 +79,7 @@ export async function scrapData(token: string, userId: number) {
     if (activitys.length > 0) {
         try {
             console.count("scrapData API Call");
-            await scrapActivitySchedule(token, activitys);
+            await getActivitySchedule(token, activitys);
             fixActivitySchedule(courses, sections, activitys);
             renameActivity(activitys);
         } catch (e) {
@@ -85,8 +90,6 @@ export async function scrapData(token: string, userId: number) {
     console.log("코스: ", courses);
     console.log("섹션: ", sections);
     console.log("활동: ", activitys);
-
-    console.timeEnd("scrapData");
 
     return { courses, sections, activitys };
 }
@@ -308,14 +311,14 @@ export async function scrapVideoProgress(
             document.querySelectorAll<HTMLTableRowElement>(
                 ".user_progress tbody:not(.empty) tr"
             )
-        ).forEach((node) => getActivityAlternative(node, activitys));
+        ).forEach((node) => getVideoProgressAlternative(node, activitys));
     }
 
     return Array.from(
         document.querySelectorAll<HTMLTableRowElement>(
             ".user_progress_table tbody:not(.empty) tr"
         )
-    ).forEach((node) => getActivity(node, activitys));
+    ).forEach((node) => getVideoProgress(node, activitys));
 }
 
 function getTime(timeText: string) {
@@ -332,7 +335,10 @@ function getTime(timeText: string) {
     }
 }
 
-function getActivity(node: HTMLTableRowElement, activitys: MoodleActivity[]) {
+function getVideoProgress(
+    node: HTMLTableRowElement,
+    activitys: MoodleActivity[]
+) {
     const cellElements = node.querySelectorAll("td");
     const cellCount = cellElements.length;
 
@@ -347,18 +353,17 @@ function getActivity(node: HTMLTableRowElement, activitys: MoodleActivity[]) {
     );
     const attendance = attendanceElement.textContent?.trim() === "O";
     const modId = Number(buttonElement?.getAttribute("data-modid") ?? -1);
+    const endDate = Number(buttonElement?.getAttribute("data-eterm") ?? -1);
     const progress = Math.min(playTime / requirement, 1.0);
 
     const find = activitys.find((item) => item.modId === modId);
 
-    if (find === undefined) {
-        return;
+    if (find !== undefined) {
+        find.progress = attendance ? 1.0 : progress;
     }
-
-    find.progress = attendance ? 1.0 : progress;
 }
 
-function getActivityAlternative(
+function getVideoProgressAlternative(
     node: HTMLTableRowElement,
     activitys: MoodleActivity[]
 ) {
@@ -378,14 +383,12 @@ function getActivityAlternative(
 
     const find = activitys.find((item) => item.modId === modId);
 
-    if (find === undefined) {
-        return;
+    if (find !== undefined) {
+        find.progress = progress;
     }
-
-    find.progress = progress;
 }
 
-export async function scrapActivitySchedule(
+export async function getActivitySchedule(
     token: string,
     activitys: MoodleActivity[]
 ) {
@@ -394,11 +397,28 @@ export async function scrapActivitySchedule(
         9999, // 2047-05-18
         token
     );
+
     if (isMoodleError(response)) {
         return;
     }
 
+    // 특정 스케줄을 제외
+    const banWords = ["is due to be graded"];
+
     for (const item of response.events) {
+        let isBanned = false;
+
+        for (const words of banWords) {
+            if (item.name.endsWith(words)) {
+                isBanned = true;
+                break;
+            }
+        }
+
+        if (isBanned) {
+            continue;
+        }
+
         const id = Number(item.url.split("=")[1] ?? -1);
         const find = activitys.find((activity) => activity.id === id);
 
@@ -407,6 +427,9 @@ export async function scrapActivitySchedule(
         }
 
         find.startDate = item.timestart;
+        if (find.endDate !== null) {
+            console.log("종료 기간 지정됨:", item.name);
+        }
         find.endDate = item.timestart + item.timeduration;
     }
 }

@@ -75,7 +75,7 @@ export async function sessionLogin(id: string, password: string) {
 
     if (pathUrl === LOGIN_SUCCESSFUL_URL) {
         // 로그인 성공
-        await extendSessionCookie();
+        // await extendSessionCookie();
         return true;
     }
 
@@ -96,7 +96,7 @@ export async function extendSessionCookie() {
     // 기존 세션 쿠키를 제거
     await removeSessionCookie();
 
-    // 세션 쿠키 길이를 연장하여 다시 지정
+    // 세션 쿠키 길이를 1시간 연장하여 다시 지정
     const value = sessionCookie?.value;
     const expire = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
     await chrome.cookies.set({
