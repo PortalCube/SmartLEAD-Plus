@@ -69,7 +69,7 @@ const ActivityName = styled.p`
     color: #dfdfdf;
 
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
 `;
 
 const DeadlineBadge = styled.p`
@@ -81,7 +81,7 @@ const DeadlineBadge = styled.p`
     justify-content: right;
 
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
 
     &.emergency {
         background-color: #ff3434;

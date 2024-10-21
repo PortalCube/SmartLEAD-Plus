@@ -1,16 +1,16 @@
 import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { useDynamicTextResize } from "../../hooks/useDynamicTextResize.ts";
 // import PropTypes from "prop-types";
 
 const Item = styled.a`
     display: flex;
     width: 100%;
-    margin: 4px 0;
-    padding: 8px 10px;
+    padding: 6px 8px;
     border-radius: 4px;
-    // background-color: #ffffff1f;
     color: white;
+    box-sizing: border-box;
 
     gap: 8px;
 
@@ -24,8 +24,8 @@ const Item = styled.a`
     text-decoration: none;
 
     &:hover {
-        transform: scale(1.01);
-        background-color: #0000006f;
+        transform: scale(1.005);
+        background-color: rgba(255, 255, 255, 0.1);
         color: white;
     }
 
@@ -39,14 +39,6 @@ const Item = styled.a`
     }
 `;
 
-const Decoration = styled.div<{ $color: string }>`
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    background-color: ${(props) => props.$color};
-    flex-shrink: 0;
-`;
-
 const Title = styled.div`
     height: 100%;
     padding-left: 4px;
@@ -56,8 +48,12 @@ const Title = styled.div`
     white-space: pre;
     flex-grow: 1;
 
+    line-height: 1.2;
+
     &.new-line {
         white-space: pre-line;
+        word-break: keep-all;
+        text-wrap: pretty;
     }
 
     @media (max-width: 1299px) {
@@ -73,7 +69,7 @@ const Subtitle = styled.div`
     overflow: hidden;
     white-space: pre;
 
-    line-height: 24px;
+    line-height: 1.2;
 
     &.new-line {
         white-space: pre-line;
@@ -85,8 +81,8 @@ const Subtitle = styled.div`
 `;
 
 const Icon = styled.img`
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background-color: #ffffff;
     flex-shrink: 0;
@@ -96,7 +92,7 @@ const Icon = styled.img`
     }
 `;
 
-const TITLE_MIN_SIZE = 13;
+const TITLE_MIN_SIZE = 12;
 const SUBTITLE_MIN_SIZE = 11;
 
 const CourseItem = ({
@@ -112,37 +108,25 @@ const CourseItem = ({
     color: string;
     imageUrl: string | null;
 }) => {
-    const titleRef = useRef<HTMLDivElement>(null);
-    const subtitleRef = useRef<HTMLDivElement>(null);
-    const [titleSize, setTitleSize] = useState<number>(18);
-    const [subtitleSize, setSubtitleSize] = useState<number>(14);
-
-    useEffect(() => {
-        if (subtitleRef && subtitleRef.current) {
-            if (
-                subtitleSize > SUBTITLE_MIN_SIZE &&
-                subtitleRef.current.scrollWidth >
-                    subtitleRef.current.clientWidth
-            ) {
-                setSubtitleSize((size) => size - 1);
-            }
-        }
-
-        if (titleRef && titleRef.current) {
-            if (
-                titleSize > TITLE_MIN_SIZE &&
-                titleRef.current.scrollWidth > titleRef.current.clientWidth
-            ) {
-                setTitleSize((size) => size - 1);
-            }
-        }
-    }, [titleRef, subtitleRef, title, subtitle, titleSize, subtitleSize]);
+    const [titleRef, titleSize] = useDynamicTextResize(
+        title,
+        16,
+        TITLE_MIN_SIZE
+    );
+    const [subtitleRef, subtitleSize] = useDynamicTextResize(
+        subtitle,
+        14,
+        SUBTITLE_MIN_SIZE
+    );
 
     return (
         <Item href={url} target="_blank">
-            <Decoration $color={color} />
+            <Icon
+                src={imageUrl ?? ""}
+                className={classNames({ visible: imageUrl })}
+            />
             <Title
-                ref={titleRef}
+                ref={titleRef as React.RefObject<HTMLDivElement>}
                 style={{ fontSize: `${titleSize}px` }}
                 className={classNames({
                     "new-line": titleSize <= TITLE_MIN_SIZE,
@@ -150,7 +134,7 @@ const CourseItem = ({
             >
                 {title}
             </Title>
-            <Subtitle
+            {/* <Subtitle
                 ref={subtitleRef}
                 style={{ fontSize: `${subtitleSize}px` }}
                 className={classNames({
@@ -158,20 +142,9 @@ const CourseItem = ({
                 })}
             >
                 {subtitle}
-            </Subtitle>
-            <Icon
-                src={imageUrl ?? ""}
-                className={classNames({ visible: imageUrl })}
-            />
+            </Subtitle> */}
         </Item>
     );
 };
-
-// CourseItem.propTypes = {
-//     url: PropTypes.string.isRequired,
-//     title: PropTypes.string.isRequired,
-//     subtitle: PropTypes.string.isRequired,
-//     color: PropTypes.string.isRequired,
-// };
 
 export default CourseItem;
